@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="grid lg:grid-cols-2 gap-4">
+  <section class="rounded-2xl border border-slate-800 bg-slate-900/40 shadow-xl overflow-hidden">
+    <div class="p-4 border-b border-slate-800 font-bold">ИЛОВА КАРДАНИ МАВЗӮЪ</div>
+    <form class="p-4 space-y-3" method="post" action="/admin/create">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs text-slate-400">СИНФ</label>
+          <input name="grade" value="9" class="w-full px-3 py-2 rounded-xl border border-slate-800 bg-slate-950/40">
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">№ (ORDER)</label>
+          <input name="order_no" placeholder="1" class="w-full px-3 py-2 rounded-xl border border-slate-800 bg-slate-950/40">
+        </div>
+      </div>
+
+      <div>
+        <label class="text-xs text-slate-400">УНВОН</label>
+        <input name="title" class="w-full px-3 py-2 rounded-xl border border-slate-800 bg-slate-950/40">
+      </div>
+
+      <div>
+        <label class="text-xs text-slate-400">МАТНИ АСОСӢ (MARKDOWN)</label>
+        <textarea name="body_md" rows="8" class="w-full px-3 py-2 rounded-xl border border-slate-800 bg-slate-950/40"></textarea>
+      </div>
+
+      <div class="grid gap-3">
+        <div>
+          <label class="text-xs text-slate-400">КОРИ АМАЛӢ (MARKDOWN)</label>
+          <textarea name="practical_md" rows="4" class="w-full px-3 py-2 rounded-xl border border-slate-800 bg-slate-950/40"></textarea>
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">КОРИ ГУРӮҲӢ (MARKDOWN)</label>
+          <textarea name="groupwork_md" rows="4" class="w-full px-3 py-2 rounded-xl border border-slate-800 bg-slate-950/40"></textarea>
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">САВОЛҲО (MARKDOWN)</label>
+          <textarea name="questions_md" rows="4" class="w-full px-3 py-2 rounded-xl border border-slate-800 bg-slate-950/40"></textarea>
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">КОД (MARKDOWN, ```PY/HTML ... ```)</label>
+          <textarea name="code_md" rows="5" class="w-full px-3 py-2 rounded-xl border border-slate-800 bg-slate-950/40"></textarea>
+        </div>
+      </div>
+
+      <button class="px-4 py-2 rounded-xl border border-blue-400 bg-blue-500/10 hover:bg-blue-500/20 font-bold">
+        САБТ КУН
+      </button>
+    </form>
+  </section>
+
+  <section class="rounded-2xl border border-slate-800 bg-slate-900/40 shadow-xl overflow-hidden">
+    <div class="p-4 border-b border-slate-800 font-bold">НАМУНАИ MARKDOWN</div>
+    <div class="p-4 text-sm text-slate-300 leading-7">
+      <p class="text-slate-200 font-semibold mb-2">Намуна:</p>
+      <pre><code>**ИНТЕРНЕТ** — ШАБАКАИ ҶАҲОНИСТ...
+
+### ТАЪРИХ
+- 1969 — ARPANET
+- 1991 — WWW
+
+### ФОИДА
+- ТАЪЛИМ
+- МУОШИРАТ
+
+```html
+&lt;h1&gt;САЛОМ&lt;/h1&gt;
+```</code></pre>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+/* Агар хоҳед ҳама матн калон шавад: */
+.uppercase-all h1, .uppercase-all h2, .uppercase-all h3, .uppercase-all p, .uppercase-all li {
+  text-transform: uppercase;
+}
+
+/* Pygments code block tuning */
+pre {
+  overflow-x: auto;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgb(30 41 59);
+  background: rgba(2, 6, 23, 0.75);
+}
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="grid lg:grid-cols-[340px_1fr] gap-4">
+  <!-- TOC -->
+  <section class="rounded-2xl border border-slate-800 bg-slate-900/40 shadow-xl overflow-hidden">
+    <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+      <div class="font-bold">ФЕҲРИСТ (СИНФ {{ grade }})</div>
+      <div class="text-xs text-slate-400">{{ total }} МАВЗӮЪ</div>
+    </div>
+    <div class="p-4 space-y-3">
+      <input name="q" type="search"
+             class="w-full px-3 py-2 rounded-xl border border-slate-800 bg-slate-950/40 outline-none"
+             placeholder="ҶУСТУҶӮ..."
+             hx-get="/partials/toc?grade={{grade}}"
+             hx-trigger="keyup changed delay:250ms"
+             hx-target="#toc"
+             hx-swap="innerHTML">
+      <div id="toc">
+        {% include "partials/toc.html" %}
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE -->
+  <section class="rounded-2xl border border-slate-800 bg-slate-900/40 shadow-xl overflow-hidden">
+    <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+      <div class="text-xs text-slate-400">САҲИФА</div>
+      <div class="flex items-center gap-2 text-xs">
+        <span class="text-slate-400">TEXT CAPS:</span>
+        <button class="px-3 py-1 rounded-xl border border-slate-800 hover:border-slate-600"
+                onclick="document.getElementById('page').classList.toggle('uppercase-all')">
+          TOGGLE
+        </button>
+      </div>
+    </div>
+
+    <div id="page" class="p-4 {% if uppercase %}uppercase-all{% endif %}">
+      {% if topic %}
+        {% include "partials/topic_card.html" %}
+      {% else %}
+        <div class="text-slate-300">АЗ ФЕҲРИСТ ЯК МАВЗӮЪРО ИНТИХОБ КУНЕД.</div>
+      {% endif %}
+    </div>
+  </section>
+</div>
+{% endblock %}

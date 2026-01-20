@@ -1,0 +1,9 @@
+<div class="max-h-[65vh] overflow-auto pr-1 space-y-2">
+  {% for t in topics %}
+    <a href="/topic/{{ t.id }}"
+       class="block px-3 py-2 rounded-xl border border-slate-800 hover:border-slate-600 {% if active_id==t.id %}bg-blue-500/10 border-blue-400{% endif %}">
+      <div class="text-xs text-slate-400">№ {{ t.order_no }}</div>
+      <div class="font-semibold">{{ t.title }}</div>
+    </a>
+  {% endfor %}
+</div>

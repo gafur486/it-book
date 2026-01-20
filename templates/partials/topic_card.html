@@ -1,0 +1,51 @@
+<div class="space-y-4">
+  <div>
+    <div class="text-xs text-slate-400">№ {{ topic.order_no }} | СИНФ {{ topic.grade }}</div>
+    <h2 class="text-2xl font-extrabold tracking-tight">{{ topic.title }}</h2>
+  </div>
+
+  <div class="rounded-2xl border border-slate-800 bg-slate-950/30 p-4">
+    <div class="text-sm text-slate-300 leading-7">{{ body_html | safe }}</div>
+  </div>
+
+  {% if practical_html %}
+  <div class="rounded-2xl border border-slate-800 bg-slate-950/30 p-4">
+    <h3 class="font-bold mb-2">КОРИ АМАЛӢ (ИНФИРОДӢ)</h3>
+    <div class="text-sm text-slate-300 leading-7">{{ practical_html | safe }}</div>
+  </div>
+  {% endif %}
+
+  {% if groupwork_html %}
+  <div class="rounded-2xl border border-slate-800 bg-slate-950/30 p-4">
+    <h3 class="font-bold mb-2">КОРИ ГУРӮҲӢ</h3>
+    <div class="text-sm text-slate-300 leading-7">{{ groupwork_html | safe }}</div>
+  </div>
+  {% endif %}
+
+  {% if questions_html %}
+  <div class="rounded-2xl border border-slate-800 bg-slate-950/30 p-4">
+    <h3 class="font-bold mb-2">САВОЛҲО БАРОИ МУҲОКИМА</h3>
+    <div class="text-sm text-slate-300 leading-7">{{ questions_html | safe }}</div>
+  </div>
+  {% endif %}
+
+  {% if code_html %}
+  <div class="rounded-2xl border border-slate-800 bg-slate-950/30 p-4">
+    <h3 class="font-bold mb-2">КОД / НАМУНА</h3>
+    <div class="text-sm text-slate-300 leading-7">{{ code_html | safe }}</div>
+  </div>
+  {% endif %}
+
+  <div class="flex flex-wrap gap-2 pt-2">
+    {% if prev_id %}
+      <a class="px-4 py-2 rounded-xl border border-slate-800 hover:border-slate-600" href="/topic/{{prev_id}}">← ҚАБЛӢ</a>
+    {% else %}
+      <span class="px-4 py-2 rounded-xl border border-slate-800 opacity-50">← ҚАБЛӢ</span>
+    {% endif %}
+    {% if next_id %}
+      <a class="px-4 py-2 rounded-xl border border-slate-800 hover:border-slate-600" href="/topic/{{next_id}}">БАЪДӢ →</a>
+    {% else %}
+      <span class="px-4 py-2 rounded-xl border border-slate-800 opacity-50">БАЪДӢ →</span>
+    {% endif %}
+  </div>
+</div>
