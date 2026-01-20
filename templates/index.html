@@ -1,40 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="grid gap-6 lg:grid-cols-[380px_1fr]">
-  <!-- TOC -->
-  <section class="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-[0_10px_30px_rgba(2,6,23,0.08)]">
-    <!-- subtle header glow -->
-    <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-indigo-500/10 via-fuchsia-500/10 to-cyan-500/10"></div>
 
-    <div class="relative p-5 border-b border-slate-100 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 shadow-[0_8px_18px_rgba(79,70,229,0.25)]"></div>
-        <div class="leading-tight">
-          <div class="text-[13px] tracking-wide text-slate-500">ФЕҲРИСТ</div>
-          <div class="font-extrabold text-slate-900">
-            СИНФ <span class="text-indigo-600">{{ grade }}</span>
-          </div>
+<div class="grid gap-6 lg:grid-cols-[360px_1fr]">
+  <!-- TOC -->
+  <section class="rounded-3xl border border-slate-200 bg-white shadow-[0_12px_30px_rgba(2,6,23,0.08)]
+                  dark:border-slate-800 dark:bg-slate-900/60">
+    <div class="p-5 border-b border-slate-100 flex items-center justify-between
+                dark:border-slate-800">
+      <div class="leading-tight">
+        <div class="text-[12px] tracking-wide text-slate-500 dark:text-slate-400" data-i18n="tocLabel">ФЕҲРИСТ</div>
+        <div class="font-extrabold text-slate-900 dark:text-white">
+          <span data-i18n="classLabel">СИНФ</span>
+          <span class="text-indigo-600 dark:text-indigo-400">{{ grade }}</span>
         </div>
       </div>
-
       <div class="text-right">
-        <div class="text-[11px] text-slate-400">ҲАМАҢ МАВЗӮЪҲО</div>
-        <div class="font-semibold text-slate-700">
-          {{ total }} <span class="text-slate-400">дона</span>
+        <div class="text-[11px] text-slate-400" data-i18n="countLabel">ҲАМАШ</div>
+        <div class="font-semibold text-slate-700 dark:text-slate-200">
+          {{ total }} <span class="text-slate-400" data-i18n="itemsLabel">дона</span>
         </div>
       </div>
     </div>
 
     <div class="p-5 space-y-4">
       <!-- Search -->
-      <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-inner">
+      <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-inner
+                  dark:border-slate-800 dark:bg-slate-950/40">
         <svg class="h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M10.5 19a8.5 8.5 0 1 1 0-17 8.5 8.5 0 0 1 0 17Z" stroke="currentColor" stroke-width="2"/>
           <path d="M16.8 16.8 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
 
         <input name="q" type="search"
-               class="w-full bg-transparent text-slate-900 placeholder:text-slate-400 outline-none"
+               class="w-full bg-transparent text-slate-900 placeholder:text-slate-400 outline-none
+                      dark:text-slate-100 dark:placeholder:text-slate-500"
                placeholder="ҶУСТУҶӮ..."
                hx-get="/partials/toc?grade={{grade}}"
                hx-trigger="keyup changed delay:250ms"
@@ -47,56 +46,42 @@
         {% include "partials/toc.html" %}
       </div>
 
-      <!-- Footer hint -->
-      <div class="pt-2 text-xs text-slate-400">
+      <div class="pt-1 text-xs text-slate-400" data-i18n="hint">
         Маслиҳат: номи мавзӯъро нависед, то зуд ёбед.
       </div>
     </div>
   </section>
 
   <!-- PAGE -->
-  <section class="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-[0_10px_30px_rgba(2,6,23,0.08)]">
-    <!-- decorative side gradient -->
-    <div class="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-gradient-to-br from-cyan-400/20 via-indigo-400/20 to-fuchsia-400/20 blur-2xl"></div>
-    <div class="absolute -left-28 -bottom-28 h-72 w-72 rounded-full bg-gradient-to-br from-amber-400/15 via-rose-400/15 to-purple-400/15 blur-2xl"></div>
-
-    <div class="relative p-5 border-b border-slate-100 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center shadow-[0_10px_20px_rgba(2,6,23,0.18)]">
-          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M7 4h10a2 2 0 0 1 2 2v14l-4-2-4 2-4-2-4 2V6a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div>
-          <div class="text-[11px] uppercase tracking-widest text-slate-400">САҲИФА</div>
-          <div class="font-bold text-slate-900">Мавзӯъ ва шарҳ</div>
-        </div>
+  <section class="rounded-3xl border border-slate-200 bg-white shadow-[0_12px_30px_rgba(2,6,23,0.08)]
+                  dark:border-slate-800 dark:bg-slate-900/60">
+    <div class="p-5 border-b border-slate-100 flex items-center justify-between
+                dark:border-slate-800">
+      <div class="leading-tight">
+        <div class="text-[11px] uppercase tracking-widest text-slate-400" data-i18n="pageLabel">САҲИФА</div>
+        <div class="font-bold text-slate-900 dark:text-white" data-i18n="pageTitle">Мавзӯъ ва шарҳ</div>
       </div>
 
-      <div class="flex items-center gap-3 text-xs">
-        <span class="text-slate-400">TEXT CAPS</span>
-
-        <button type="button"
-                class="group inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 font-semibold text-slate-800 shadow-sm hover:bg-white hover:border-slate-300 active:scale-[0.99] transition"
-                onclick="document.getElementById('page').classList.toggle('uppercase-all')">
-          <span class="h-2.5 w-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500 group-hover:from-indigo-600 group-hover:to-fuchsia-600"></span>
-          TOGGLE
-        </button>
-      </div>
+      <!-- (UI admin removed intentionally) -->
+      <div class="text-xs text-slate-400" data-i18n="uiNote">Танзимот дар боло аст.</div>
     </div>
 
-    <div id="page" class="relative p-6 md:p-8 {% if uppercase %}uppercase-all{% endif %}">
+    <div id="page" class="p-6 md:p-8">
       {% if topic %}
-        <div class="rounded-3xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 shadow-[0_12px_28px_rgba(2,6,23,0.06)]">
+        <div class="rounded-3xl border border-slate-200 bg-gradient-to-b from-white to-slate-50
+                    shadow-[0_12px_28px_rgba(2,6,23,0.06)]
+                    dark:border-slate-800 dark:from-slate-950/30 dark:to-slate-950/10">
           <div class="p-6 md:p-7">
             {% include "partials/topic_card.html" %}
           </div>
         </div>
       {% else %}
-        <div class="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
-          <div class="mx-auto mb-4 h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 shadow-[0_10px_22px_rgba(79,70,229,0.22)]"></div>
-          <div class="text-slate-900 font-extrabold text-lg">Мавзӯъ интихоб нашудааст</div>
-          <div class="mt-2 text-slate-500">
+        <div class="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center
+                    dark:border-slate-700 dark:bg-slate-950/30">
+          <div class="mx-auto mb-4 h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500
+                      shadow-[0_10px_22px_rgba(79,70,229,0.22)]"></div>
+          <div class="text-slate-900 dark:text-white font-extrabold text-lg" data-i18n="emptyTitle">Мавзӯъ интихоб нашудааст</div>
+          <div class="mt-2 text-slate-500 dark:text-slate-300" data-i18n="emptyText">
             Аз феҳрист як мавзӯъро интихоб кунед, то матн дар ин ҷо кушода шавад.
           </div>
         </div>
@@ -104,4 +89,56 @@
     </div>
   </section>
 </div>
+
+<script>
+  // Extra i18n for index page labels
+  const extra = {
+    tg: {
+      tocLabel: "ФЕҲРИСТ",
+      classLabel: "СИНФ",
+      countLabel: "ҲАМАШ",
+      itemsLabel: "дона",
+      hint: "Маслиҳат: номи мавзӯъро нависед, то зуд ёбед.",
+      pageLabel: "САҲИФА",
+      pageTitle: "Мавзӯъ ва шарҳ",
+      uiNote: "Танзимот дар боло аст.",
+      emptyTitle: "Мавзӯъ интихоб нашудааст",
+      emptyText: "Аз феҳрист як мавзӯъро интихоб кунед, то матн дар ин ҷо кушода шавад."
+    },
+    ru: {
+      tocLabel: "ОГЛАВЛЕНИЕ",
+      classLabel: "КЛАСС",
+      countLabel: "ВСЕГО",
+      itemsLabel: "шт.",
+      hint: "Подсказка: начните вводить название темы, чтобы быстро найти.",
+      pageLabel: "СТРАНИЦА",
+      pageTitle: "Тема и описание",
+      uiNote: "Настройки — сверху.",
+      emptyTitle: "Тема не выбрана",
+      emptyText: "Выберите тему слева, чтобы материал открылся здесь."
+    }
+  };
+
+  // merge into the dict created in base.html (if exists)
+  if (window.dict) {
+    window.dict.tg = Object.assign(window.dict.tg, extra.tg);
+    window.dict.ru = Object.assign(window.dict.ru, extra.ru);
+    const cur = localStorage.getItem('itbook_lang') || 'tg';
+    // re-apply language to update page-only labels
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const d = window.dict[cur] || window.dict.tg;
+      if (d[key]) el.textContent = d[key];
+    });
+  } else {
+    // If base.html dict is not global, do a minimal apply:
+    const cur = localStorage.getItem('itbook_lang') || 'tg';
+    const d = extra[cur] || extra.tg;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (d[key]) el.textContent = d[key];
+    });
+  }
+</script>
+
 {% endblock %}

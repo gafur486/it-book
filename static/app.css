@@ -1,16 +1,48 @@
-/* Агар хоҳед ҳама матн калон шавад: */
+/* Global helpers */
 .uppercase-all h1, .uppercase-all h2, .uppercase-all h3, .uppercase-all p, .uppercase-all li {
   text-transform: uppercase;
 }
 
-/* Pygments code block tuning */
+/* Links / small UI */
+.link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.btn-soft {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgb(226 232 240);
+  background: rgba(255,255,255,0.7);
+  font-weight: 700;
+  font-size: 14px;
+}
+.dark .btn-soft {
+  border-color: rgb(30 41 59);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+/* Code blocks (Pygments/Markdown) */
 pre {
   overflow-x: auto;
   padding: 14px;
   border-radius: 16px;
-  border: 1px solid rgb(30 41 59);
+  border: 1px solid rgb(226 232 240);
+  background: rgba(248, 250, 252, 0.9);
+}
+.dark pre {
+  border-color: rgb(30 41 59);
   background: rgba(2, 6, 23, 0.75);
 }
+
 code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
+
+/* Make rendered markdown text more readable */
+.prose-lite p { margin: 0.5rem 0; }
+.prose-lite ul { margin: 0.5rem 0; padding-left: 1.2rem; }
+.prose-lite li { margin: 0.25rem 0; }
