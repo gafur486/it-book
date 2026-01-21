@@ -3,63 +3,55 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>{{ title or "IT Book" }}</title>
+  <title>{{ title or "Китобчаи ИТ" }}</title>
+  <link rel="stylesheet" href="/static/style.css">
 
+  <!-- Tailwind CDN (зебоӣ зуд) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' }</script>
 
+  <!-- HTMX -->
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+
   <link rel="stylesheet" href="/static/app.css"/>
 </head>
+<body class="bg-slate-950 text-slate-100">
+  <header class="sticky top-0 z-10 border-b border-slate-800 bg-slate-950/90 backdrop-blur">
+    <div class="container">
+  <div class="nav">
+    <div class="brand">IT-Book <span>9</span></div>
+    <div>
+      <a class="btn" href="/">Главная</a>
+      <a class="btn primary" href="/admin">Добавить тему</a>
+    </div>
+  </div>
 
-<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-  <header class="sticky top-0 z-20 border-b border-slate-200/70 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-950/75">
-    <div class="mx-auto max-w-6xl px-4 py-3">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="flex items-center gap-3">
-          <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-cyan-500 shadow-[0_10px_22px_rgba(79,70,229,0.25)]"></div>
-          <div class="leading-tight">
-            <div class="text-xs tracking-wide text-slate-500 dark:text-slate-400" data-i18n="subtitle">КИТОБЧАИ ТЕХНОЛОГИЯҲОИ ИТТИЛООТӢ</div>
-            <div class="font-extrabold tracking-tight text-slate-900 dark:text-white" data-i18n="title">IT BOOK</div>
-          </div>
-        </div>
+  <div class="grid">
+    <div class="card">
+      <div class="badge">Оглавление</div>
+      <div class="hr"></div>
+      <div class="list">
+        <!-- дар ин ҷо рӯйхати мавзӯъҳо -->
+      </div>
+    </div>
 
-        <div class="flex flex-wrap items-center gap-2">
-          <div class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
-            <span class="text-slate-400" data-i18n="timeLabel">СОАТ:</span>
-            <span id="clock" class="tabular-nums">--:--:--</span>
-          </div>
+    <div class="card content">
+      <h1 class="h1">Информационные технологии — 9 класс</h1>
+      <p class="p">Выберите тему слева, чтобы открыть материал, примеры и практическую работу.</p>
+      <!-- матни мавзӯъ дар ҳамин ҷо -->
+    </div>
+  </div>
+</div>
 
-          <button id="btnLang" type="button"
-                  class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-semibold hover:bg-slate-50
-                         dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">
-            RU/TJ
-          </button>
-
-          <button id="btnTheme" type="button"
-                  class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-semibold hover:bg-slate-50
-                         dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800"
-                  data-i18n="theme">
-            ШАБ/РӮЗ
-          </button>
-
-          <button id="btnCaps" type="button"
-                  class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-semibold hover:bg-slate-50
-                         dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800"
-                  data-i18n="caps">
-            КАЛОН/МАЙДА
-          </button>
-
-          <a href="/"
-             class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-semibold hover:bg-slate-50
-                    dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800"
-             data-i18n="home">АСОСӢ</a>
-
-          <a href="/books"
-             class="px-3 py-2 rounded-xl border border-slate-200 bg-white text-sm font-semibold hover:bg-slate-50
-                    dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800"
-             data-i18n="books">КИТОБҲО</a>
-        </div>
+    <div class="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between gap-3">
+      <div>
+        <div class="text-lg font-extrabold tracking-tight">КИТОБЧАИ ТЕХНОЛОГИЯҲОИ ИТТИЛООТӢ</div>
+        <div class="text-xs text-slate-400">ФЕҲРИСТ + САҲИФАҲО + ИЛОВАКУНӢ АЗ ВЕБ</div>
+      </div>
+      <div class="flex gap-2">
+        <a class="px-3 py-2 rounded-xl border border-slate-800 hover:border-slate-600"
+           href="/">КИТОБ</a>
+        <a class="px-3 py-2 rounded-xl border border-slate-800 hover:border-slate-600"
+           href="/admin">АДМИН</a>
       </div>
     </div>
   </header>
@@ -67,109 +59,5 @@
   <main class="mx-auto max-w-6xl px-4 py-6">
     {% block content %}{% endblock %}
   </main>
-
-  <footer class="border-t border-slate-200/70 bg-white/60 dark:border-slate-800 dark:bg-slate-950/50">
-    <div class="mx-auto max-w-6xl px-4 py-6">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div class="text-sm text-slate-600 dark:text-slate-300">
-          <div class="font-semibold text-slate-900 dark:text-white">Убайдуллоев Ғафурҷон</div>
-          <div>Тел: <a class="link" href="tel:001666922">001666922</a></div>
-        </div>
-
-        <div class="flex flex-wrap gap-2">
-          <a class="btn-soft" href="https://wa.me/001666922" target="_blank" rel="noopener">WhatsApp</a>
-          <a class="btn-soft" href="tg://resolve?phone=001666922">Telegram</a>
-          <a class="btn-soft" href="https://t.me/+001666922" target="_blank" rel="noopener">Telegram Web</a>
-        </div>
-      </div>
-
-      <div class="mt-3 text-xs text-slate-400" data-i18n="footerNote">
-        Агар WhatsApp/Telegram кушода нашавад, рақамро бо коди кишвар (масалан +992...) гузоред.
-      </div>
-    </div>
-  </footer>
-
-  <script>
-    // Preferences
-    const LS = { lang:'itbook_lang', theme:'itbook_theme', caps:'itbook_caps' };
-
-    // Global dict for i18n
-    window.dict = {
-      tg: {
-        subtitle: "КИТОБЧАИ ТЕХНОЛОГИЯҲОИ ИТТИЛООТӢ",
-        title: "IT BOOK",
-        timeLabel: "СОАТ:",
-        theme: "ШАБ/РӮЗ",
-        caps: "КАЛОН/МАЙДА",
-        home: "АСОСӢ",
-        books: "КИТОБҲО",
-        footerNote: "Агар WhatsApp/Telegram кушода нашавад, рақамро бо коди кишвар (масалан +992...) гузоред."
-      },
-      ru: {
-        subtitle: "КАРМАННЫЙ СПРАВОЧНИК ПО ИТ",
-        title: "IT BOOK",
-        timeLabel: "ВРЕМЯ:",
-        theme: "НОЧЬ/ДЕНЬ",
-        caps: "ВЕРХ/НИЗ",
-        home: "ГЛАВНАЯ",
-        books: "КНИГИ",
-        footerNote: "Если WhatsApp/Telegram не открывается, укажите номер с кодом страны (например +992...)."
-      }
-    };
-
-    function applyLang(lang) {
-      const d = window.dict[lang] || window.dict.tg;
-      document.documentElement.lang = lang;
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (d[key]) el.textContent = d[key];
-      });
-      localStorage.setItem(LS.lang, lang);
-    }
-
-    function applyTheme(theme) {
-      const isDark = theme === 'dark';
-      document.documentElement.classList.toggle('dark', isDark);
-      localStorage.setItem(LS.theme, isDark ? 'dark' : 'light');
-    }
-
-    function applyCaps(on) {
-      document.body.classList.toggle('uppercase-all', !!on);
-      localStorage.setItem(LS.caps, on ? '1' : '0');
-    }
-
-    // Clock
-    function pad(n){ return String(n).padStart(2,'0'); }
-    function tickClock() {
-      const now = new Date();
-      const t = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-      const el = document.getElementById('clock');
-      if (el) el.textContent = t;
-    }
-    setInterval(tickClock, 1000);
-    tickClock();
-
-    // Init
-    const initLang  = localStorage.getItem(LS.lang)  || 'tg';
-    const initTheme = localStorage.getItem(LS.theme) || 'dark';
-    const initCaps  = localStorage.getItem(LS.caps)  || '0';
-    applyLang(initLang);
-    applyTheme(initTheme);
-    applyCaps(initCaps === '1');
-
-    // Buttons
-    document.getElementById('btnLang')?.addEventListener('click', () => {
-      const cur = localStorage.getItem(LS.lang) || 'tg';
-      applyLang(cur === 'tg' ? 'ru' : 'tg');
-    });
-    document.getElementById('btnTheme')?.addEventListener('click', () => {
-      const cur = localStorage.getItem(LS.theme) || 'dark';
-      applyTheme(cur === 'dark' ? 'light' : 'dark');
-    });
-    document.getElementById('btnCaps')?.addEventListener('click', () => {
-      const cur = localStorage.getItem(LS.caps) || '0';
-      applyCaps(cur !== '1');
-    });
-  </script>
 </body>
 </html>
