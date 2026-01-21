@@ -1,14 +1,16 @@
-/* Global helpers */
-.uppercase-all h1, .uppercase-all h2, .uppercase-all h3, .uppercase-all p, .uppercase-all li {
+/* CAPS toggle */
+.uppercase-all h1, .uppercase-all h2, .uppercase-all h3,
+.uppercase-all p, .uppercase-all li {
   text-transform: uppercase;
 }
 
-/* Links / small UI */
+/* Simple links */
 .link {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
+/* Footer buttons */
 .btn-soft {
   display: inline-flex;
   align-items: center;
@@ -25,7 +27,7 @@
   background: rgba(15, 23, 42, 0.6);
 }
 
-/* Code blocks (Pygments/Markdown) */
+/* Code blocks */
 pre {
   overflow-x: auto;
   padding: 14px;
@@ -37,12 +39,11 @@ pre {
   border-color: rgb(30 41 59);
   background: rgba(2, 6, 23, 0.75);
 }
-
 code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
-/* Make rendered markdown text more readable */
+/* Readability for rendered markdown */
 .prose-lite p { margin: 0.5rem 0; }
 .prose-lite ul { margin: 0.5rem 0; padding-left: 1.2rem; }
 .prose-lite li { margin: 0.25rem 0; }
