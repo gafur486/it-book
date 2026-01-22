@@ -7,7 +7,7 @@
 
   <link rel="stylesheet" href="/static/app.css"/>
 
-  <!-- HTMX барои ҷустуҷӯи феҳрист -->
+  <!-- HTMX -->
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 
   <!-- Lucide icons -->
@@ -26,6 +26,25 @@
       </div>
 
       <div class="actions">
+        <!-- Grade selector -->
+        <form method="get" action="/" style="display:flex; gap:10px; align-items:center;">
+          <select name="grade" class="input" style="width:120px; padding:10px 12px;">
+            {% for g in [7,8,9,10,11] %}
+              <option value="{{ g }}" {% if grade==g %}selected{% endif %}>Синф {{ g }}</option>
+            {% endfor %}
+          </select>
+          <button class="btn" type="submit">
+            <i data-lucide="filter" class="icon"></i>
+            <span data-i18n="choose">Интихоб</span>
+          </button>
+        </form>
+
+        <!-- Clock -->
+        <div class="btn" style="cursor:default;">
+          <i data-lucide="clock" class="icon"></i>
+          <span id="liveClock" style="font-variant-numeric: tabular-nums;">--:--:--</span>
+        </div>
+
         <a class="btn" href="/">
           <i data-lucide="home" class="icon"></i>
           <span data-i18n="home">Асосӣ</span>
@@ -36,14 +55,28 @@
           <span data-i18n="books">Китобҳо</span>
         </a>
 
-        <a class="btn" href="/admin">
-          <i data-lucide="plus-circle" class="icon"></i>
-          <span data-i18n="admin">Админ</span>
-        </a>
+        {% if is_admin %}
+          <a class="btn" href="/admin">
+            <i data-lucide="shield" class="icon"></i>
+            <span data-i18n="admin">Админ</span>
+          </a>
+
+          <form method="post" action="/logout">
+            <button class="btn" type="submit">
+              <i data-lucide="log-out" class="icon"></i>
+              <span>Logout</span>
+            </button>
+          </form>
+        {% else %}
+          <a class="btn" href="/login?next=/admin">
+            <i data-lucide="log-in" class="icon"></i>
+            <span>Login</span>
+          </a>
+        {% endif %}
 
         <button class="btn" type="button" id="openSettings">
           <i data-lucide="settings" class="icon"></i>
-          <span data-i18n="settings'short">Настройки</span>
+          <span data-i18n="settingsShort">Настройки</span>
         </button>
       </div>
     </div>
@@ -133,7 +166,18 @@
   </div>
 
   <script>
-    // ------- Settings state -------
+    // ---------- Live clock ----------
+    function pad2(n){ return String(n).padStart(2,"0"); }
+    function tick(){
+      const d = new Date();
+      const t = pad2(d.getHours()) + ":" + pad2(d.getMinutes()) + ":" + pad2(d.getSeconds());
+      const el = document.getElementById("liveClock");
+      if (el) el.textContent = t;
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    // ---------- Settings state ----------
     const KEY = "itbook.settings.v1";
     const defaultState = { theme: "dark", icons: "m", lang: "tg" };
 
@@ -148,115 +192,104 @@
     function saveState(s){
       localStorage.setItem(KEY, JSON.stringify(s));
     }
-    function applyState(s){
-      document.documentElement.setAttribute("data-theme", s.theme);
-      document.documentElement.setAttribute("data-icons", s.icons);
-      document.documentElement.setAttribute("lang", s.lang);
 
-      // active buttons
-      document.querySelectorAll("#themeSeg button").forEach(b => b.classList.toggle("active", b.dataset.theme === s.theme));
-      document.querySelectorAll("#iconsSeg button").forEach(b => b.classList.toggle("active", b.dataset.icons === s.icons));
-      document.querySelectorAll("#langSeg button").forEach(b => b.classList.toggle("active", b.dataset.lang === s.lang));
-
-      applyI18n(s.lang);
-      // re-render icons after DOM changes
-      if (window.lucide) lucide.createIcons();
-    }
-
-    // ------- i18n -------
+    // ---------- i18n ----------
     const i18n = {
       tg: {
-        "brand":"Китобчаи ИТ",
-        "subtitle":"Феҳрист • Мавзӯъҳо • Китобҳо",
-        "home":"Асосӣ",
-        "books":"Китобҳо",
-        "admin":"Админ",
-        "settings":"Танзимот",
-        "settings'short":"Настройки",
-        "settingsHint":"Ин ҷо намоиш ва забонро иваз мекунед",
-        "close":"Бастан",
-        "theme":"Тема",
-        "themeHint":"Сиёҳ ё сафед интихоб кунед",
-        "dark":"Сиёҳ",
-        "light":"Сафед",
-        "icons":"Андозаи иконка",
-        "iconsHint":"Майда / миёна / калон",
-        "small":"Майда",
-        "medium":"Миёна",
-        "large":"Калон",
-        "lang":"Забон",
-        "langHint":"Тоҷикӣ / Русӣ / English",
-        "about":"Дар бораи ман",
-        "aboutText":"Муаллим(а) аз фанни информатика. Ин платформа барои омӯзиш: мавзӯъҳо, корҳои амалӣ, китобҳои PDF.",
-        "aboutEditHint":"Агар хоҳед, матни “Дар бораи ман”-ро ба маълумоти шахсии худ иваз мекунем.",
-        "support":"Поддержка",
-        "supportText":"Барои кӯмак: навиштани масъала, пешниҳодҳо, ё хатогиҳо — ба админ хабар диҳед.",
-        "supportHint":"Дар версияи оянда: формаи “тамос” + Telegram/Email.",
-        "ui":"Плавность панелҳо",
-        "uiHint":"Панелҳо аллакай floating + transition доранд.",
-        "uiNote":"Агар хоҳед, анимацияро зиёд/кам мекунем."
+        brand:"Китобчаи ИТ",
+        subtitle:"Феҳрист • Мавзӯъҳо • Китобҳо",
+        home:"Асосӣ",
+        books:"Китобҳо",
+        admin:"Админ",
+        choose:"Интихоб",
+        settings:"Танзимот",
+        settingsShort:"Настройки",
+        settingsHint:"Ин ҷо намоиш ва забонро иваз мекунед",
+        close:"Бастан",
+        theme:"Тема",
+        themeHint:"Сиёҳ ё сафед интихоб кунед",
+        dark:"Сиёҳ",
+        light:"Сафед",
+        icons:"Андозаи иконка",
+        iconsHint:"Майда / миёна / калон",
+        small:"Майда",
+        medium:"Миёна",
+        large:"Калон",
+        lang:"Забон",
+        langHint:"Тоҷикӣ / Русӣ / English",
+        about:"Дар бораи ман",
+        aboutText:"Муаллим(а) аз фанни информатика. Ин платформа барои омӯзиш: мавзӯъҳо, корҳои амалӣ, китобҳои PDF.",
+        aboutEditHint:"Агар хоҳед, матни “Дар бораи ман”-ро ба маълумоти шахсии худ иваз мекунем.",
+        support:"Поддержка",
+        supportText:"Барои кӯмак: навиштани масъала, пешниҳодҳо, ё хатогиҳо — ба админ хабар диҳед.",
+        supportHint:"Дар версияи оянда: формаи “тамос” + Telegram/Email.",
+        ui:"Плавность панелҳо",
+        uiHint:"Панелҳо аллакай floating + transition доранд.",
+        uiNote:"Агар хоҳед, анимацияро зиёд/кам мекунем."
       },
       ru: {
-        "brand":"IT-Книжка",
-        "subtitle":"Оглавление • Темы • Книги",
-        "home":"Главная",
-        "books":"Книги",
-        "admin":"Админ",
-        "settings":"Настройки",
-        "settings'short":"Настройки",
-        "settingsHint":"Здесь меняются тема, язык и размеры",
-        "close":"Закрыть",
-        "theme":"Тема",
-        "themeHint":"Выберите тёмную или светлую",
-        "dark":"Тёмная",
-        "light":"Светлая",
-        "icons":"Размер иконок",
-        "iconsHint":"Маленькие / средние / большие",
-        "small":"Маленькие",
-        "medium":"Средние",
-        "large":"Большие",
-        "lang":"Язык",
-        "langHint":"Тоҷикӣ / Русский / English",
-        "about":"Обо мне",
-        "aboutText":"Учитель информатики. Платформа для обучения: темы, практические работы, PDF-книги.",
-        "aboutEditHint":"Если хотите — заменим текст «Обо мне» на ваши данные.",
-        "support":"Поддержка",
-        "supportText":"Для помощи: вопросы, предложения и ошибки — сообщайте администратору.",
-        "supportHint":"Следующая версия: форма обратной связи + Telegram/Email.",
-        "ui":"Плавность панелей",
-        "uiHint":"Панели уже имеют floating-анимацию и плавные переходы.",
-        "uiNote":"Можно усилить/ослабить анимацию по вашему желанию."
+        brand:"IT-Книжка",
+        subtitle:"Оглавление • Темы • Книги",
+        home:"Главная",
+        books:"Книги",
+        admin:"Админ",
+        choose:"Выбрать",
+        settings:"Настройки",
+        settingsShort:"Настройки",
+        settingsHint:"Здесь меняются тема, язык и размеры",
+        close:"Закрыть",
+        theme:"Тема",
+        themeHint:"Выберите тёмную или светлую",
+        dark:"Тёмная",
+        light:"Светлая",
+        icons:"Размер иконок",
+        iconsHint:"Маленькие / средние / большие",
+        small:"Маленькие",
+        medium:"Средние",
+        large:"Большие",
+        lang:"Язык",
+        langHint:"Тоҷикӣ / Русский / English",
+        about:"Обо мне",
+        aboutText:"Учитель информатики. Платформа для обучения: темы, практические работы, PDF-книги.",
+        aboutEditHint:"Если хотите — заменим текст «Обо мне» на ваши данные.",
+        support:"Поддержка",
+        supportText:"Для помощи: вопросы, предложения и ошибки — сообщайте администратору.",
+        supportHint:"Следующая версия: форма обратной связи + Telegram/Email.",
+        ui:"Плавность панелей",
+        uiHint:"Панели уже имеют floating-анимацию и плавные переходы.",
+        uiNote:"Можно усилить/ослабить анимацию по вашему желанию."
       },
       en: {
-        "brand":"IT Booklet",
-        "subtitle":"TOC • Topics • Books",
-        "home":"Home",
-        "books":"Books",
-        "admin":"Admin",
-        "settings":"Settings",
-        "settings'short":"Settings",
-        "settingsHint":"Change theme, language and sizes here",
-        "close":"Close",
-        "theme":"Theme",
-        "themeHint":"Choose dark or light",
-        "dark":"Dark",
-        "light":"Light",
-        "icons":"Icon size",
-        "iconsHint":"Small / Medium / Large",
-        "small":"Small",
-        "medium":"Medium",
-        "large":"Large",
-        "lang":"Language",
-        "langHint":"Тоҷикӣ / Русский / English",
-        "about":"About",
-        "aboutText":"Computer science teacher. A learning platform: topics, practice tasks, PDF books.",
-        "aboutEditHint":"If you want, we can replace the About text with your full profile.",
-        "support":"Support",
-        "supportText":"For help: questions, suggestions or bugs — contact the admin.",
-        "supportHint":"Next version: contact form + Telegram/Email.",
-        "ui":"Panel smoothness",
-        "uiHint":"Panels already use floating animation and smooth transitions.",
-        "uiNote":"We can tune animation strength if needed."
+        brand:"IT Booklet",
+        subtitle:"TOC • Topics • Books",
+        home:"Home",
+        books:"Books",
+        admin:"Admin",
+        choose:"Select",
+        settings:"Settings",
+        settingsShort:"Settings",
+        settingsHint:"Change theme, language and sizes here",
+        close:"Close",
+        theme:"Theme",
+        themeHint:"Choose dark or light",
+        dark:"Dark",
+        light:"Light",
+        icons:"Icon size",
+        iconsHint:"Small / Medium / Large",
+        small:"Small",
+        medium:"Medium",
+        large:"Large",
+        lang:"Language",
+        langHint:"Тоҷикӣ / Русский / English",
+        about:"About",
+        aboutText:"Computer science teacher. A learning platform: topics, practice tasks, PDF books.",
+        aboutEditHint:"If you want, we can replace the About text with your full profile.",
+        support:"Support",
+        supportText:"For help: questions, suggestions or bugs — contact the admin.",
+        supportHint:"Next version: contact form + Telegram/Email.",
+        ui:"Panel smoothness",
+        uiHint:"Panels already use floating animation and smooth transitions.",
+        uiNote:"We can tune animation strength if needed."
       }
     };
 
@@ -268,7 +301,21 @@
       });
     }
 
-    // ------- modal -------
+    function applyState(s){
+      document.documentElement.setAttribute("data-theme", s.theme);
+      document.documentElement.setAttribute("data-icons", s.icons);
+      document.documentElement.setAttribute("lang", s.lang);
+
+      document.querySelectorAll("#themeSeg button").forEach(b => b.classList.toggle("active", b.dataset.theme === s.theme));
+      document.querySelectorAll("#iconsSeg button").forEach(b => b.classList.toggle("active", b.dataset.icons === s.icons));
+      document.querySelectorAll("#langSeg button").forEach(b => b.classList.toggle("active", b.dataset.lang === s.lang));
+
+      applyI18n(s.lang);
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // ---------- modal ----------
     const modal = document.getElementById("settingsModal");
     const openBtn = document.getElementById("openSettings");
     const closeBtn = document.getElementById("closeSettings");
@@ -287,7 +334,7 @@
     modal?.addEventListener("click", (e)=>{ if(e.target === modal) closeModal(); });
     window.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeModal(); });
 
-    // ------- segments events -------
+    // ---------- segments ----------
     const state = loadState();
 
     document.querySelectorAll("#themeSeg button").forEach(b=>{
@@ -312,8 +359,8 @@
       });
     });
 
-    // init icons + state
-    lucide.createIcons();
+    // init
+    if (window.lucide) lucide.createIcons();
     applyState(state);
   </script>
 </body>

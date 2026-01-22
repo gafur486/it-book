@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card floating" style="max-width:520px; margin: 0 auto;">
+  <div class="card-head">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <i data-lucide="lock" class="icon"></i>
+      <div>
+        <div class="tag">SECURE</div>
+        <div style="font-weight:900;">Воридшавӣ ба админ</div>
+      </div>
+    </div>
+    <div class="tag">Login</div>
+  </div>
+
+  <div class="card-body" style="display:grid; gap:12px;">
+    {% if error %}
+      <div class="blockbox" style="border-color: rgba(244,63,94,.35);">
+        <div style="font-weight:900; margin-bottom:6px;">Хато</div>
+        <div class="p" style="color: var(--muted);">{{ error }}</div>
+      </div>
+    {% endif %}
+
+    <form method="post" action="/login" style="display:grid; gap:10px;">
+      <input type="hidden" name="next" value="{{ next }}"/>
+
+      <input class="input" name="username" placeholder="Логин" autocomplete="username" required>
+      <input class="input" name="password" type="password" placeholder="Парол" autocomplete="current-password" required>
+
+      <button class="btn" type="submit">
+        <i data-lucide="log-in" class="icon"></i>
+        Даромадан
+      </button>
+    </form>
+
+    <div class="footer-note">
+      Маслиҳат: барои амният, ADMIN_USER/ADMIN_PASS-ро дар Environment Variables гузоред.
+    </div>
+  </div>
+</div>
+
+<script> if (window.lucide) lucide.createIcons(); </script>
+{% endblock %}
