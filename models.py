@@ -7,11 +7,14 @@ class Topic(SQLModel, table=True):
     order_no: int = Field(index=True)
     title: str
 
-    # матни асосӣ (Markdown)
     body_md: str
-
-    # блокҳои иловагӣ (Markdown)
     practical_md: str = ""
     groupwork_md: str = ""
     questions_md: str = ""
-    code_md: str = ""  # метавон чанд блоки код ҳам бо Markdown навишт
+    code_md: str = ""
+
+class Book(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    title: str
+    file_path: str  # мисол: "books/test.pdf" (дар дохили static)
+    grade: Optional[int] = Field(default=None, index=True)

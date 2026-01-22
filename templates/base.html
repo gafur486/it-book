@@ -1,63 +1,320 @@
 <!doctype html>
-<html lang="tg">
+<html lang="tg" data-theme="dark" data-icons="m">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>{{ title or "Китобчаи ИТ" }}</title>
-  <link rel="stylesheet" href="/static/style.css">
-
-  <!-- Tailwind CDN (зебоӣ зуд) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- HTMX -->
-  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <title>{{ page_title or "IT-Book" }}</title>
 
   <link rel="stylesheet" href="/static/app.css"/>
+
+  <!-- HTMX барои ҷустуҷӯи феҳрист -->
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-slate-950 text-slate-100">
-  <header class="sticky top-0 z-10 border-b border-slate-800 bg-slate-950/90 backdrop-blur">
-    <div class="container">
-  <div class="nav">
-    <div class="brand">IT-Book <span>9</span></div>
-    <div>
-      <a class="btn" href="/">Главная</a>
-      <a class="btn primary" href="/admin">Добавить тему</a>
-    </div>
-  </div>
 
-  <div class="grid">
-    <div class="card">
-      <div class="badge">Оглавление</div>
-      <div class="hr"></div>
-      <div class="list">
-        <!-- дар ин ҷо рӯйхати мавзӯъҳо -->
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-badge"></div>
+        <div class="brand-title">
+          <b data-i18n="brand">Китобчаи ИТ</b>
+          <small data-i18n="subtitle">Феҳрист • Мавзӯъҳо • Китобҳо</small>
+        </div>
       </div>
-    </div>
 
-    <div class="card content">
-      <h1 class="h1">Информационные технологии — 9 класс</h1>
-      <p class="p">Выберите тему слева, чтобы открыть материал, примеры и практическую работу.</p>
-      <!-- матни мавзӯъ дар ҳамин ҷо -->
-    </div>
-  </div>
-</div>
+      <div class="actions">
+        <a class="btn" href="/">
+          <i data-lucide="home" class="icon"></i>
+          <span data-i18n="home">Асосӣ</span>
+        </a>
 
-    <div class="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between gap-3">
-      <div>
-        <div class="text-lg font-extrabold tracking-tight">КИТОБЧАИ ТЕХНОЛОГИЯҲОИ ИТТИЛООТӢ</div>
-        <div class="text-xs text-slate-400">ФЕҲРИСТ + САҲИФАҲО + ИЛОВАКУНӢ АЗ ВЕБ</div>
-      </div>
-      <div class="flex gap-2">
-        <a class="px-3 py-2 rounded-xl border border-slate-800 hover:border-slate-600"
-           href="/">КИТОБ</a>
-        <a class="px-3 py-2 rounded-xl border border-slate-800 hover:border-slate-600"
-           href="/admin">АДМИН</a>
+        <a class="btn" href="/books">
+          <i data-lucide="book-open" class="icon"></i>
+          <span data-i18n="books">Китобҳо</span>
+        </a>
+
+        <a class="btn" href="/admin">
+          <i data-lucide="plus-circle" class="icon"></i>
+          <span data-i18n="admin">Админ</span>
+        </a>
+
+        <button class="btn" type="button" id="openSettings">
+          <i data-lucide="settings" class="icon"></i>
+          <span data-i18n="settings'short">Настройки</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="mx-auto max-w-6xl px-4 py-6">
+  <main class="container">
     {% block content %}{% endblock %}
   </main>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal" id="settingsModal" aria-hidden="true">
+    <div class="modal-panel" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <i data-lucide="settings" class="icon"></i>
+          <div>
+            <div style="font-weight:800;letter-spacing:.2px;" data-i18n="settings">Танзимот</div>
+            <div class="tag" data-i18n="settingsHint">Ин ҷо намоиш ва забонро иваз мекунед</div>
+          </div>
+        </div>
+
+        <button class="btn" type="button" id="closeSettings">
+          <i data-lucide="x" class="icon"></i>
+          <span data-i18n="close">Бастан</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="setting-row">
+          <h3 data-i18n="theme">Тема</h3>
+          <p data-i18n="themeHint">Сиёҳ ё сафед интихоб кунед</p>
+          <div class="seg" id="themeSeg">
+            <button type="button" data-theme="dark" data-i18n="dark">Сиёҳ</button>
+            <button type="button" data-theme="light" data-i18n="light">Сафед</button>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <h3 data-i18n="icons">Андозаи иконка</h3>
+          <p data-i18n="iconsHint">Майда / миёна / калон</p>
+          <div class="seg" id="iconsSeg">
+            <button type="button" data-icons="s" data-i18n="small">Майда</button>
+            <button type="button" data-icons="m" data-i18n="medium">Миёна</button>
+            <button type="button" data-icons="l" data-i18n="large">Калон</button>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <h3 data-i18n="lang">Забон</h3>
+          <p data-i18n="langHint">Тоҷикӣ / Русӣ / English</p>
+          <div class="seg" id="langSeg">
+            <button type="button" data-lang="tg">Тоҷикӣ</button>
+            <button type="button" data-lang="ru">Русский</button>
+            <button type="button" data-lang="en">English</button>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <h3 data-i18n="about">Дар бораи ман</h3>
+          <p data-i18n="aboutText">
+            Муаллим(а) аз фанни информатика. Ин платформа барои омӯзиш: мавзӯъҳо, корҳои амалӣ, китобҳои PDF.
+          </p>
+          <div class="footer-note" data-i18n="aboutEditHint">
+            Агар хоҳед, матни “Дар бораи ман”-ро ба маълумоти шахсии худ иваз мекунем.
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <h3 data-i18n="support">Поддержка</h3>
+          <p data-i18n="supportText">
+            Барои кӯмак: навиштани масъала, пешниҳодҳо, ё хатогиҳо — ба админ хабар диҳед.
+          </p>
+          <div class="footer-note" data-i18n="supportHint">
+            Дар версияи оянда: формаи “тамос” + Telegram/Email.
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <h3 data-i18n="ui">Плавность панелҳо</h3>
+          <p data-i18n="uiHint">Панелҳо аллакай floating + transition доранд.</p>
+          <div class="footer-note" data-i18n="uiNote">
+            Агар хоҳед, анимацияро зиёд/кам мекунем.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ------- Settings state -------
+    const KEY = "itbook.settings.v1";
+    const defaultState = { theme: "dark", icons: "m", lang: "tg" };
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(KEY);
+        return raw ? { ...defaultState, ...JSON.parse(raw) } : { ...defaultState };
+      } catch(e){
+        return { ...defaultState };
+      }
+    }
+    function saveState(s){
+      localStorage.setItem(KEY, JSON.stringify(s));
+    }
+    function applyState(s){
+      document.documentElement.setAttribute("data-theme", s.theme);
+      document.documentElement.setAttribute("data-icons", s.icons);
+      document.documentElement.setAttribute("lang", s.lang);
+
+      // active buttons
+      document.querySelectorAll("#themeSeg button").forEach(b => b.classList.toggle("active", b.dataset.theme === s.theme));
+      document.querySelectorAll("#iconsSeg button").forEach(b => b.classList.toggle("active", b.dataset.icons === s.icons));
+      document.querySelectorAll("#langSeg button").forEach(b => b.classList.toggle("active", b.dataset.lang === s.lang));
+
+      applyI18n(s.lang);
+      // re-render icons after DOM changes
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // ------- i18n -------
+    const i18n = {
+      tg: {
+        "brand":"Китобчаи ИТ",
+        "subtitle":"Феҳрист • Мавзӯъҳо • Китобҳо",
+        "home":"Асосӣ",
+        "books":"Китобҳо",
+        "admin":"Админ",
+        "settings":"Танзимот",
+        "settings'short":"Настройки",
+        "settingsHint":"Ин ҷо намоиш ва забонро иваз мекунед",
+        "close":"Бастан",
+        "theme":"Тема",
+        "themeHint":"Сиёҳ ё сафед интихоб кунед",
+        "dark":"Сиёҳ",
+        "light":"Сафед",
+        "icons":"Андозаи иконка",
+        "iconsHint":"Майда / миёна / калон",
+        "small":"Майда",
+        "medium":"Миёна",
+        "large":"Калон",
+        "lang":"Забон",
+        "langHint":"Тоҷикӣ / Русӣ / English",
+        "about":"Дар бораи ман",
+        "aboutText":"Муаллим(а) аз фанни информатика. Ин платформа барои омӯзиш: мавзӯъҳо, корҳои амалӣ, китобҳои PDF.",
+        "aboutEditHint":"Агар хоҳед, матни “Дар бораи ман”-ро ба маълумоти шахсии худ иваз мекунем.",
+        "support":"Поддержка",
+        "supportText":"Барои кӯмак: навиштани масъала, пешниҳодҳо, ё хатогиҳо — ба админ хабар диҳед.",
+        "supportHint":"Дар версияи оянда: формаи “тамос” + Telegram/Email.",
+        "ui":"Плавность панелҳо",
+        "uiHint":"Панелҳо аллакай floating + transition доранд.",
+        "uiNote":"Агар хоҳед, анимацияро зиёд/кам мекунем."
+      },
+      ru: {
+        "brand":"IT-Книжка",
+        "subtitle":"Оглавление • Темы • Книги",
+        "home":"Главная",
+        "books":"Книги",
+        "admin":"Админ",
+        "settings":"Настройки",
+        "settings'short":"Настройки",
+        "settingsHint":"Здесь меняются тема, язык и размеры",
+        "close":"Закрыть",
+        "theme":"Тема",
+        "themeHint":"Выберите тёмную или светлую",
+        "dark":"Тёмная",
+        "light":"Светлая",
+        "icons":"Размер иконок",
+        "iconsHint":"Маленькие / средние / большие",
+        "small":"Маленькие",
+        "medium":"Средние",
+        "large":"Большие",
+        "lang":"Язык",
+        "langHint":"Тоҷикӣ / Русский / English",
+        "about":"Обо мне",
+        "aboutText":"Учитель информатики. Платформа для обучения: темы, практические работы, PDF-книги.",
+        "aboutEditHint":"Если хотите — заменим текст «Обо мне» на ваши данные.",
+        "support":"Поддержка",
+        "supportText":"Для помощи: вопросы, предложения и ошибки — сообщайте администратору.",
+        "supportHint":"Следующая версия: форма обратной связи + Telegram/Email.",
+        "ui":"Плавность панелей",
+        "uiHint":"Панели уже имеют floating-анимацию и плавные переходы.",
+        "uiNote":"Можно усилить/ослабить анимацию по вашему желанию."
+      },
+      en: {
+        "brand":"IT Booklet",
+        "subtitle":"TOC • Topics • Books",
+        "home":"Home",
+        "books":"Books",
+        "admin":"Admin",
+        "settings":"Settings",
+        "settings'short":"Settings",
+        "settingsHint":"Change theme, language and sizes here",
+        "close":"Close",
+        "theme":"Theme",
+        "themeHint":"Choose dark or light",
+        "dark":"Dark",
+        "light":"Light",
+        "icons":"Icon size",
+        "iconsHint":"Small / Medium / Large",
+        "small":"Small",
+        "medium":"Medium",
+        "large":"Large",
+        "lang":"Language",
+        "langHint":"Тоҷикӣ / Русский / English",
+        "about":"About",
+        "aboutText":"Computer science teacher. A learning platform: topics, practice tasks, PDF books.",
+        "aboutEditHint":"If you want, we can replace the About text with your full profile.",
+        "support":"Support",
+        "supportText":"For help: questions, suggestions or bugs — contact the admin.",
+        "supportHint":"Next version: contact form + Telegram/Email.",
+        "ui":"Panel smoothness",
+        "uiHint":"Panels already use floating animation and smooth transitions.",
+        "uiNote":"We can tune animation strength if needed."
+      }
+    };
+
+    function applyI18n(lang){
+      const dict = i18n[lang] || i18n.tg;
+      document.querySelectorAll("[data-i18n]").forEach(el=>{
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) el.textContent = dict[key];
+      });
+    }
+
+    // ------- modal -------
+    const modal = document.getElementById("settingsModal");
+    const openBtn = document.getElementById("openSettings");
+    const closeBtn = document.getElementById("closeSettings");
+
+    function openModal(){
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+    }
+    function closeModal(){
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+    }
+
+    openBtn?.addEventListener("click", openModal);
+    closeBtn?.addEventListener("click", closeModal);
+    modal?.addEventListener("click", (e)=>{ if(e.target === modal) closeModal(); });
+    window.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeModal(); });
+
+    // ------- segments events -------
+    const state = loadState();
+
+    document.querySelectorAll("#themeSeg button").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        state.theme = b.dataset.theme;
+        saveState(state);
+        applyState(state);
+      });
+    });
+    document.querySelectorAll("#iconsSeg button").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        state.icons = b.dataset.icons;
+        saveState(state);
+        applyState(state);
+      });
+    });
+    document.querySelectorAll("#langSeg button").forEach(b=>{
+      b.addEventListener("click", ()=>{
+        state.lang = b.dataset.lang;
+        saveState(state);
+        applyState(state);
+      });
+    });
+
+    // init icons + state
+    lucide.createIcons();
+    applyState(state);
+  </script>
 </body>
 </html>

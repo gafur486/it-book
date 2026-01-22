@@ -6,10 +6,9 @@ from sqlmodel import Session, select
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markdown_it import MarkdownIt
 from mdit_py_plugins.tasklists import tasklists_plugin
-from pygments.formatters import HtmlFormatter
 
-from db import init_db, get_session
-from models import Topic
+from db import init_db, get_session, engine
+from models import Topic, Book
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -25,58 +24,81 @@ md = (
 )
 
 def render_md(text: str) -> str:
-    if not text:
-        return ""
-    return md.render(text)
+    return md.render(text or "")
 
 @app.on_event("startup")
 def on_startup():
     init_db()
-    # илова кардани seed, агар база холӣ бошад
-    from sqlmodel import Session
-    from db import engine
+    # seed ако база холӣ бошад
     with Session(engine) as s:
-        exists = s.exec(select(Topic).where(Topic.grade == 9)).first()
-        if not exists:
-            seed_grade9(s)
+        any_topic = s.exec(select(Topic).limit(1)).first()
+        if not any_topic:
+            seed_topics(s)
+            seed_books(s)
             s.commit()
 
-def seed_grade9(s: Session) -> None:
+def seed_topics(s: Session) -> None:
     topics = [
-        (1, "АСОСҲОИ ПОЙДОИШИ ШАБАКАҲОИ КОМПЮТЕРӢ"),
-        (2, "ИНТЕРНЕТ"),
-        (3, "ХАДАМОТИ АБРӢ. ХАДАМОТИ ЗАХИРАСОЗИИ АБРӢ"),
-        (4, "АСОСҲОИ ЗАБОНИ HTML"),
+        (9, 1, "АСОСҲОИ ПОЙДОИШИ ШАБАКАҲОИ КОМПЮТЕРӢ"),
+        (9, 2, "ИНТЕРНЕТ"),
+        (9, 3, "ХАДАМОТИ АБРӢ. ХАДАМОТИ ЗАХИРАСОЗИИ АБРӢ"),
+        (9, 4, "АСОСҲОИ ЗАБОНИ HTML"),
     ]
-    for order_no, title in topics:
+    for grade, order_no, title in topics:
         s.add(Topic(
-            grade=9,
+            grade=grade,
             order_no=order_no,
             title=title,
             body_md=(
-                f"**{title}** — ИН ҶО МАТНИ АСОСӢ БО 50–60 ҶУМЛА МЕОЯД.\n\n"
-                "### ТАЪРИХ\n"
-                "- 1969 — ARPANET (БАРОИ МАВЗӮЪҲОИ ШАБАКА)\n"
-                "- 1991 — WWW (БАРОИ МАВЗӮЪҲОИ ВЕБ)\n\n"
-                "### ФОИДА\n"
-                "- ДАСТРАСӢ БА ИТТИЛООТ\n"
-                "- КОРИ ГУРӮҲӢ\n"
+                f"## {title}\n\n"
+                "Ин ҷо матни мавзӯъ бо мисолҳо ҷойгир мешавад.\n\n"
+                "### Нуқтаҳои асосӣ\n"
+                "- Таърифҳо\n"
+                "- Мисолҳо\n"
+                "- Хулоса\n"
             ),
-            practical_md="- 3 ҚАДАМРО ИҶРО КУНЕД...\n- НАТИҶАРО НАВИСЕД...",
-            groupwork_md="- ГУРӮҲ БА 3 НАФАР...\n- МАЪРУЗА ТАЙЁР КУНЕД...",
-            questions_md="- САВОЛ 1?\n- САВОЛ 2?\n- САВОЛ 3?",
-            code_md="```html\n<h1>САЛОМ</h1>\n```"
+            practical_md=(
+                "### Кори амалӣ\n"
+                "- Қадами 1: ...\n"
+                "- Қадами 2: ...\n"
+                "- Қадами 3: ...\n"
+            ),
+            groupwork_md=(
+                "### Кори гурӯҳӣ\n"
+                "- Гурӯҳ 3–4 нафар\n"
+                "- Презентация тайёр кунед\n"
+            ),
+            questions_md=(
+                "### Саволҳо\n"
+                "1) ...?\n"
+                "2) ...?\n"
+                "3) ...?\n"
+            ),
+            code_md=(
+                "```html\n"
+                "<h1>Салом</h1>\n"
+                "```\n"
+            )
         ))
+
+def seed_books(s: Session) -> None:
+    # ЭЗОҲ: PDF-ҳоро дар static/books/ ҷойгир кунед
+    demo = [
+        ("Китоби тестӣ (намуна)", "books/test.pdf", 9),
+    ]
+    for title, file_path, grade in demo:
+        s.add(Book(title=title, file_path=file_path, grade=grade))
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request, grade: int = 9, session: Session = Depends(get_session)):
     topics = session.exec(
         select(Topic).where(Topic.grade == grade).order_by(Topic.order_no)
     ).all()
+
     tpl = env.get_template("index.html")
     return tpl.render(
-        title=f"Китобча — синфи {grade}",
         request=request,
+        page_title=f"Китобча — синфи {grade}",
         grade=grade,
         topics=topics,
         total=len(topics),
@@ -89,7 +111,6 @@ def home(request: Request, grade: int = 9, session: Session = Depends(get_sessio
         prev_id=None,
         next_id=None,
         active_id=None,
-        uppercase=False,
     )
 
 @app.get("/topic/{topic_id}", response_class=HTMLResponse)
@@ -102,14 +123,14 @@ def view_topic(request: Request, topic_id: int, session: Session = Depends(get_s
         select(Topic).where(Topic.grade == topic.grade).order_by(Topic.order_no)
     ).all()
 
-    idx = next((i for i,t in enumerate(all_topics) if t.id == topic_id), 0)
-    prev_id = all_topics[idx-1].id if idx > 0 else None
-    next_id = all_topics[idx+1].id if idx < len(all_topics)-1 else None
+    idx = next((i for i, t in enumerate(all_topics) if t.id == topic_id), 0)
+    prev_id = all_topics[idx - 1].id if idx > 0 else None
+    next_id = all_topics[idx + 1].id if idx < len(all_topics) - 1 else None
 
     tpl = env.get_template("index.html")
     return tpl.render(
-        title=topic.title,
         request=request,
+        page_title=topic.title,
         grade=topic.grade,
         topics=all_topics,
         total=len(all_topics),
@@ -122,23 +143,40 @@ def view_topic(request: Request, topic_id: int, session: Session = Depends(get_s
         prev_id=prev_id,
         next_id=next_id,
         active_id=topic_id,
-        uppercase=False,
     )
 
 @app.get("/partials/toc", response_class=HTMLResponse)
 def partial_toc(request: Request, grade: int = 9, q: str = "", session: Session = Depends(get_session)):
     stmt = select(Topic).where(Topic.grade == grade)
-    if q:
-        q_like = f"%{q.strip()}%"
-        stmt = stmt.where(Topic.title.ilike(q_like))
+    if q.strip():
+        like = f"%{q.strip()}%"
+        stmt = stmt.where(Topic.title.ilike(like))
     topics = session.exec(stmt.order_by(Topic.order_no)).all()
+
     tpl = env.get_template("partials/toc.html")
     return tpl.render(request=request, topics=topics, active_id=None)
+
+@app.get("/books", response_class=HTMLResponse)
+def books(request: Request, q: str = "", session: Session = Depends(get_session)):
+    stmt = select(Book)
+    if q.strip():
+        like = f"%{q.strip()}%"
+        stmt = stmt.where(Book.title.ilike(like))
+    items = session.exec(stmt.order_by(Book.id.desc())).all()
+
+    tpl = env.get_template("books.html")
+    return tpl.render(request=request, page_title="Китобҳо", books=items, q=q)
+
+@app.get("/wiki", response_class=HTMLResponse)
+def wiki(request: Request, q: str = ""):
+    # Ин шаблон танҳо UI аст; агар хоҳед, баъд API илова мекунем.
+    tpl = env.get_template("wiki.html")
+    return tpl.render(request=request, page_title="Wikipedia", q=q, results=None, error=None)
 
 @app.get("/admin", response_class=HTMLResponse)
 def admin(request: Request):
     tpl = env.get_template("admin.html")
-    return tpl.render(title="Админ", request=request)
+    return tpl.render(request=request, page_title="Админ")
 
 @app.post("/admin/create")
 def admin_create(
@@ -166,3 +204,15 @@ def admin_create(
     session.commit()
     session.refresh(t)
     return RedirectResponse(f"/topic/{t.id}", status_code=303)
+
+@app.post("/admin/book")
+def admin_add_book(
+    title: str = Form(...),
+    file_path: str = Form(...),  # мисол: books/test.pdf
+    grade: int = Form(0),
+    session: Session = Depends(get_session),
+):
+    b = Book(title=title.strip(), file_path=file_path.strip(), grade=(grade or None))
+    session.add(b)
+    session.commit()
+    return RedirectResponse("/books", status_code=303)

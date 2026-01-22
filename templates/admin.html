@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="card floating">
+  <div class="card-head">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <i data-lucide="shield" class="icon"></i>
+      <div>
+        <div class="tag">ADMIN</div>
+        <div style="font-weight:900;">Илова кардани мавзӯъ</div>
+      </div>
+    </div>
+    <div class="tag">FastAPI + SQLModel</div>
+  </div>
+
+  <div class="card-body" style="display:grid; gap:14px;">
+    <form method="post" action="/admin/create" class="blockbox" style="display:grid; gap:10px;">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <input class="input" name="grade" type="number" placeholder="Синф (9/10/11)" required>
+        <input class="input" name="order_no" type="number" placeholder="№ (тартиб)" required>
+      </div>
+
+      <input class="input" name="title" placeholder="Номи мавзӯъ" required>
+
+      <textarea class="input" name="body_md" rows="6" placeholder="Матни асосӣ (Markdown)" style="border-radius:16px;" required></textarea>
+
+      <textarea class="input" name="practical_md" rows="4" placeholder="Кори амалӣ (Markdown)" style="border-radius:16px;"></textarea>
+      <textarea class="input" name="groupwork_md" rows="4" placeholder="Кори гурӯҳӣ (Markdown)" style="border-radius:16px;"></textarea>
+      <textarea class="input" name="questions_md" rows="4" placeholder="Саволҳо (Markdown)" style="border-radius:16px;"></textarea>
+      <textarea class="input" name="code_md" rows="4" placeholder="Код (Markdown, ``` ``` )" style="border-radius:16px;"></textarea>
+
+      <button class="btn" type="submit">
+        <i data-lucide="plus" class="icon"></i>
+        Илова кардан
+      </button>
+    </form>
+
+    <div class="blockbox">
+      <div style="font-weight:900; margin-bottom:10px;">Илова кардани китоб (PDF)</div>
+      <div class="tag" style="margin-bottom:10px;">
+        PDF-ро дар <b>static/books/</b> гузоред. Баъд дар поён file_path нависед: <b>books/nom.pdf</b>
+      </div>
+
+      <form method="post" action="/admin/book" style="display:grid; gap:10px;">
+        <input class="input" name="title" placeholder="Номи китоб" required>
+        <input class="input" name="file_path" placeholder="file_path (мисол: books/test.pdf)" required>
+        <input class="input" name="grade" type="number" placeholder="Синф (ихтиёрӣ)">
+        <button class="btn" type="submit">
+          <i data-lucide="book-plus" class="icon"></i>
+          Илова кардани китоб
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  if (window.lucide) lucide.createIcons();
+</script>
+
+{% endblock %}
