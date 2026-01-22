@@ -1,13 +1,14 @@
 import os
+import re
 import hmac
 import hashlib
-from typing import Optional
+from pathlib import Path
+from typing import Optional, List, Dict
 
-from fastapi import FastAPI, Request, Depends, Form, HTTPException
+import httpx
+from fastapi import FastAPI, Request, Depends, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from starlette.middleware.sessions import SessionMiddleware
-
 from sqlmodel import Session, select
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -15,45 +16,38 @@ from markdown_it import MarkdownIt
 from mdit_py_plugins.tasklists import tasklists_plugin
 
 from db import init_db, get_session, engine
-from models import Topic, Book
+from models import Topic
 
-# ---------------------------
-# Config (ADMIN + Sessions)
-# ---------------------------
+# =========================
+# CONFIG
+# =========================
+ADMIN_LOGIN = "abdu0004"
+ADMIN_PASSWORD = "12345678"
 
-# 1) Барои cookie-session лозим аст (ХУБ аст дар ENV нигоҳ доред)
-SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_ME_TO_A_LONG_RANDOM_SECRET")
+# Барои имзои cookie (тағйир диҳед дар сервер)
+SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_ME_SUPER_SECRET_KEY_2026").encode("utf-8")
 
-# 2) Admin credentials: беҳтараш ENV
-ADMIN_USER = os.getenv("ADMIN_USER", "abdu004")
-ADMIN_PASS = os.getenv("ADMIN_PASS", "12345678")
+# PDF folder:
+# 1) Агар PDF_BOOK_DIR set шавад -> ҳамон
+# 2) Агар не -> Desktop/pdf-book (Windows) ё ./pdf-book (дигар)
+_default_desktop_pdf = str(Path.home() / "Desktop" / "pdf-book")
+PDF_BOOK_DIR = Path(os.getenv("PDF_BOOK_DIR", _default_desktop_pdf))
+if not PDF_BOOK_DIR.exists():
+    # fallback: project folder
+    PDF_BOOK_DIR = Path("pdf-book")
 
-def _hash_pw(pw: str, salt: bytes) -> bytes:
-    # PBKDF2 (бе китобхонаҳои иловагӣ)
-    return hashlib.pbkdf2_hmac("sha256", pw.encode("utf-8"), salt, 120_000, dklen=32)
+PDF_BOOK_DIR.mkdir(parents=True, exist_ok=True)
 
-# Барои ин мисол salt-ро доимӣ мегузорем (аммо беҳтар аст аз ENV)
-_ADMIN_SALT = os.getenv("ADMIN_SALT", "itbook_salt_v1").encode("utf-8")
-_ADMIN_HASH = _hash_pw(ADMIN_PASS, _ADMIN_SALT)
-
-def verify_admin(user: str, pw: str) -> bool:
-    if user != ADMIN_USER:
-        return False
-    test = _hash_pw(pw, _ADMIN_SALT)
-    return hmac.compare_digest(test, _ADMIN_HASH)
-
-def require_admin(request: Request):
-    if not request.session.get("is_admin"):
-        # redirect to login
-        raise HTTPException(status_code=401, detail="Unauthorized")
-
-# ---------------------------
-# App
-# ---------------------------
-
+# =========================
+# APP INIT
+# =========================
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
+
+# static folder (css, images, etc.)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Serve PDFs directly from pdf-book folder
+app.mount("/pdf", StaticFiles(directory=str(PDF_BOOK_DIR)), name="pdf")
 
 env = Environment(
     loader=FileSystemLoader("templates"),
@@ -66,57 +60,117 @@ md = (
 )
 
 def render_md(text: str) -> str:
-    return md.render(text or "")
+    if not text:
+        return ""
+    return md.render(text)
+
+# =========================
+# AUTH (cookie with signature)
+# =========================
+def _sign(value: str) -> str:
+    sig = hmac.new(SECRET_KEY, value.encode("utf-8"), hashlib.sha256).hexdigest()
+    return f"{value}.{sig}"
+
+def _verify(signed: str) -> bool:
+    if not signed or "." not in signed:
+        return False
+    value, sig = signed.rsplit(".", 1)
+    expected = hmac.new(SECRET_KEY, value.encode("utf-8"), hashlib.sha256).hexdigest()
+    return hmac.compare_digest(sig, expected) and value == "admin"
+
+def is_admin(request: Request) -> bool:
+    cookie = request.cookies.get("itbook_admin", "")
+    return _verify(cookie)
+
+def require_admin(request: Request) -> Optional[RedirectResponse]:
+    if not is_admin(request):
+        return RedirectResponse("/admin/login", status_code=303)
+    return None
+
+# =========================
+# SEED
+# =========================
+def seed_grade9(s: Session) -> None:
+    topics = [
+        (1, "АСОСҲОИ ПОЙДОИШИ ШАБАКАҲОИ КОМПЮТЕРӢ"),
+        (2, "ИНТЕРНЕТ"),
+        (3, "ХАДАМОТИ АБРӢ. ХАДАМОТИ ЗАХИРАСОЗИИ АБРӢ"),
+        (4, "АСОСҲОИ ЗАБОНИ HTML"),
+    ]
+    for order_no, title in topics:
+        s.add(Topic(
+            grade=9,
+            order_no=order_no,
+            title=title,
+            body_md=(
+                f"**{title}** — ИН ҶО МАТНИ АСОСӢ МЕОЯД.\n\n"
+                "### ТАЪРИХ\n"
+                "- 1969 — ARPANET\n"
+                "- 1991 — WWW\n\n"
+                "### ФОИДА\n"
+                "- ДАСТРАСӢ БА ИТТИЛООТ\n"
+                "- КОРИ ГУРӮҲӢ\n"
+            ),
+            practical_md="- 3 ҚАДАМРО ИҶРО КУНЕД...\n- НАТИҶАРО НАВИСЕД...",
+            groupwork_md="- ГУРӮҲ БА 3 НАФАР...\n- МАЪРУЗА ТАЙЁР КУНЕД...",
+            questions_md="- САВОЛ 1?\n- САВОЛ 2?\n- САВОЛ 3?",
+            code_md="```html\n<h1>САЛОМ</h1>\n```"
+        ))
 
 @app.on_event("startup")
 def on_startup():
     init_db()
     with Session(engine) as s:
-        any_topic = s.exec(select(Topic).limit(1)).first()
-        if not any_topic:
-            seed_topics(s)
-            seed_books(s)
+        exists = s.exec(select(Topic).where(Topic.grade == 9)).first()
+        if not exists:
+            seed_grade9(s)
             s.commit()
 
-def seed_topics(s: Session) -> None:
-    topics = [
-        (7, 1, "МУҚАДДИМА. ҚОИДАҲОИ БЕХАТАРӢ"),
-        (8, 1, "АСОСҲОИ КОМПЮТЕР"),
-        (9, 1, "АСОСҲОИ ПОЙДОИШИ ШАБАКАҲОИ КОМПЮТЕРӢ"),
-        (9, 2, "ИНТЕРНЕТ"),
-        (9, 3, "ХАДАМОТИ АБРӢ. ХАДАМОТИ ЗАХИРАСОЗИИ АБРӢ"),
-        (9, 4, "АСОСҲОИ ЗАБОНИ HTML"),
-        (10, 1, "АЛГОРИТМҲО ВА БАРНОМАСОЗӢ (ОҒОЗ)"),
-        (11, 1, "ЛОИҲАСОЗИИ НИЗОМҲОИ ИТТИЛООТӢ"),
-    ]
-    for grade, order_no, title in topics:
-        s.add(Topic(
-            grade=grade,
-            order_no=order_no,
-            title=title,
-            body_md=(
-                f"## {title}\n\n"
-                "Ин ҷо матни мавзӯъ (Markdown) ҷойгир мешавад.\n\n"
-                "### Нуқтаҳои асосӣ\n"
-                "- Таъриф\n- Мисол\n- Хулоса\n"
-            ),
-            practical_md="### Кори амалӣ\n- Қадами 1\n- Қадами 2\n",
-            groupwork_md="### Кори гурӯҳӣ\n- Гурӯҳ 3–4 нафар\n",
-            questions_md="### Саволҳо\n1) ...?\n2) ...?\n",
-            code_md="```html\n<h1>Салом</h1>\n```"
-        ))
+# =========================
+# PDF BOOKS: auto-scan folder
+# =========================
+_pdf_grade_re = re.compile(r"^\s*(\d{1,2})[\s_\-]+(.+?)\.pdf\s*$", re.IGNORECASE)
 
-def seed_books(s: Session) -> None:
-    demo = [
-        ("Китоби тестӣ (намуна)", "books/test.pdf", 9),
-    ]
-    for title, file_path, grade in demo:
-        s.add(Book(title=title, file_path=file_path, grade=grade))
+def list_pdf_books(q: str = "") -> List[Dict]:
+    """
+    Returns list of dict:
+      { title, filename, grade }
+    Filename served via /pdf/{filename}
+    Title derived from filename.
+    Supported filename formats:
+      "9 - Китоби тестӣ.pdf"
+      "10_Алгоритмҳо.pdf"
+      "11-Modeling.pdf"
+    If no grade prefix -> grade = None
+    """
+    items: List[Dict] = []
+    if not PDF_BOOK_DIR.exists():
+        return items
 
-# ---------------------------
-# Public pages
-# ---------------------------
+    for p in sorted(PDF_BOOK_DIR.glob("*.pdf")):
+        name = p.name
+        title = name[:-4]  # remove .pdf
+        grade = None
 
+        m = _pdf_grade_re.match(name)
+        if m:
+            grade = int(m.group(1))
+            title = m.group(2).strip()
+
+        if q:
+            if q.strip().lower() not in title.lower():
+                continue
+
+        items.append({
+            "title": title,
+            "filename": name,
+            "grade": grade
+        })
+    return items
+
+# =========================
+# ROUTES
+# =========================
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request, grade: int = 9, session: Session = Depends(get_session)):
     topics = session.exec(
@@ -125,8 +179,8 @@ def home(request: Request, grade: int = 9, session: Session = Depends(get_sessio
 
     tpl = env.get_template("index.html")
     return tpl.render(
+        title=f"Китобча — синфи {grade}",
         request=request,
-        page_title=f"Китобча — синфи {grade}",
         grade=grade,
         topics=topics,
         total=len(topics),
@@ -139,7 +193,7 @@ def home(request: Request, grade: int = 9, session: Session = Depends(get_sessio
         prev_id=None,
         next_id=None,
         active_id=None,
-        is_admin=bool(request.session.get("is_admin")),
+        uppercase=False,
     )
 
 @app.get("/topic/{topic_id}", response_class=HTMLResponse)
@@ -153,13 +207,13 @@ def view_topic(request: Request, topic_id: int, session: Session = Depends(get_s
     ).all()
 
     idx = next((i for i, t in enumerate(all_topics) if t.id == topic_id), 0)
-    prev_id = all_topics[idx - 1].id if idx > 0 else None
-    next_id = all_topics[idx + 1].id if idx < len(all_topics) - 1 else None
+    prev_id = all_topics[idx-1].id if idx > 0 else None
+    next_id = all_topics[idx+1].id if idx < len(all_topics)-1 else None
 
     tpl = env.get_template("index.html")
     return tpl.render(
+        title=topic.title,
         request=request,
-        page_title=topic.title,
         grade=topic.grade,
         topics=all_topics,
         total=len(all_topics),
@@ -172,70 +226,104 @@ def view_topic(request: Request, topic_id: int, session: Session = Depends(get_s
         prev_id=prev_id,
         next_id=next_id,
         active_id=topic_id,
-        is_admin=bool(request.session.get("is_admin")),
+        uppercase=False,
     )
 
 @app.get("/partials/toc", response_class=HTMLResponse)
 def partial_toc(request: Request, grade: int = 9, q: str = "", session: Session = Depends(get_session)):
     stmt = select(Topic).where(Topic.grade == grade)
-    if q.strip():
-        stmt = stmt.where(Topic.title.ilike(f"%{q.strip()}%"))
-    topics = session.exec(stmt.order_by(Topic.order_no)).all()
+    if q:
+        q_like = f"%{q.strip()}%"
+        stmt = stmt.where(Topic.title.ilike(q_like))
 
+    topics = session.exec(stmt.order_by(Topic.order_no)).all()
     tpl = env.get_template("partials/toc.html")
     return tpl.render(request=request, topics=topics, active_id=None)
 
+# -------- BOOKS (PDF) --------
 @app.get("/books", response_class=HTMLResponse)
-def books(request: Request, q: str = "", session: Session = Depends(get_session)):
-    stmt = select(Book)
-    if q.strip():
-        stmt = stmt.where(Book.title.ilike(f"%{q.strip()}%"))
-    items = session.exec(stmt.order_by(Book.id.desc())).all()
-
+def books_page(request: Request, q: str = ""):
+    books = list_pdf_books(q=q)
     tpl = env.get_template("books.html")
-    return tpl.render(request=request, page_title="Китобҳо", books=items, q=q, is_admin=bool(request.session.get("is_admin")))
+    return tpl.render(title="Китобҳо", request=request, books=books, q=q)
 
-# ---------------------------
-# Auth (Login/Logout)
-# ---------------------------
+# -------- WIKI (Wikipedia) --------
+@app.get("/wiki", response_class=HTMLResponse)
+async def wiki_page(request: Request, q: str = ""):
+    """
+    Wikipedia search via REST API.
+    """
+    results = []
+    error = None
 
-@app.get("/login", response_class=HTMLResponse)
-def login_page(request: Request, next: str = "/admin"):
-    tpl = env.get_template("login.html")
-    return tpl.render(request=request, page_title="Login", error=None, next=next)
+    if q.strip():
+        try:
+            async with httpx.AsyncClient(timeout=8.0) as client:
+                # Wikipedia REST search endpoint
+                # returns JSON with pages in "pages"
+                url = "https://en.wikipedia.org/w/rest.php/v1/search/title"
+                r = await client.get(url, params={"q": q.strip(), "limit": 8})
+                r.raise_for_status()
+                data = r.json()
 
-@app.post("/login")
-def login_post(
+            pages = data.get("pages", []) or []
+            for p in pages:
+                title = p.get("title") or ""
+                excerpt = p.get("excerpt") or ""
+                # excerpt comes with HTML tags sometimes; keep it simple
+                excerpt_clean = re.sub(r"<.*?>", "", excerpt)
+                key = p.get("key") or ""
+                page_url = f"https://en.wikipedia.org/wiki/{key}" if key else "https://en.wikipedia.org"
+                results.append({
+                    "title": title,
+                    "snippet": excerpt_clean,
+                    "url": page_url
+                })
+        except Exception:
+            error = "Wikipedia ҳоло дастрас нест ё ҷустуҷӯ хато дод. Боз кӯшиш кунед."
+
+    tpl = env.get_template("wiki.html")
+    return tpl.render(title="Wikipedia", request=request, q=q, results=results, error=error)
+
+# -------- ADMIN AUTH --------
+@app.get("/admin/login", response_class=HTMLResponse)
+def admin_login_get(request: Request, msg: str = ""):
+    tpl = env.get_template("admin_login.html")
+    return tpl.render(title="Админ — Login", request=request, msg=msg)
+
+@app.post("/admin/login")
+def admin_login_post(
     request: Request,
-    username: str = Form(...),
+    login: str = Form(...),
     password: str = Form(...),
-    next: str = Form("/admin"),
 ):
-    if verify_admin(username.strip(), password):
-        request.session["is_admin"] = True
-        return RedirectResponse(next or "/admin", status_code=303)
+    if login.strip() == ADMIN_LOGIN and password == ADMIN_PASSWORD:
+        resp = RedirectResponse("/admin", status_code=303)
+        resp.set_cookie(
+            "itbook_admin",
+            _sign("admin"),
+            httponly=True,
+            samesite="lax",
+            max_age=60 * 60 * 12,  # 12 соат
+        )
+        return resp
 
-    tpl = env.get_template("login.html")
-    return HTMLResponse(
-        tpl.render(request=request, page_title="Login", error="Логин ё парол нодуруст аст.", next=next),
-        status_code=401
-    )
+    return RedirectResponse("/admin/login?msg=Хато:+login+ё+парол", status_code=303)
 
-@app.post("/logout")
-def logout(request: Request):
-    request.session.clear()
-    return RedirectResponse("/", status_code=303)
-
-# ---------------------------
-# Admin (Protected)
-# ---------------------------
+@app.get("/admin/logout")
+def admin_logout():
+    resp = RedirectResponse("/", status_code=303)
+    resp.delete_cookie("itbook_admin")
+    return resp
 
 @app.get("/admin", response_class=HTMLResponse)
 def admin(request: Request):
-    if not request.session.get("is_admin"):
-        return RedirectResponse("/login?next=/admin", status_code=303)
+    guard = require_admin(request)
+    if guard:
+        return guard
+
     tpl = env.get_template("admin.html")
-    return tpl.render(request=request, page_title="Админ", is_admin=True)
+    return tpl.render(title="Админ", request=request, pdf_dir=str(PDF_BOOK_DIR))
 
 @app.post("/admin/create")
 def admin_create(
@@ -250,8 +338,9 @@ def admin_create(
     code_md: str = Form(""),
     session: Session = Depends(get_session),
 ):
-    if not request.session.get("is_admin"):
-        return RedirectResponse("/login?next=/admin", status_code=303)
+    guard = require_admin(request)
+    if guard:
+        return guard
 
     t = Topic(
         grade=grade,
@@ -267,19 +356,3 @@ def admin_create(
     session.commit()
     session.refresh(t)
     return RedirectResponse(f"/topic/{t.id}", status_code=303)
-
-@app.post("/admin/book")
-def admin_add_book(
-    request: Request,
-    title: str = Form(...),
-    file_path: str = Form(...),
-    grade: int = Form(0),
-    session: Session = Depends(get_session),
-):
-    if not request.session.get("is_admin"):
-        return RedirectResponse("/login?next=/admin", status_code=303)
-
-    b = Book(title=title.strip(), file_path=file_path.strip(), grade=(grade or None))
-    session.add(b)
-    session.commit()
-    return RedirectResponse("/books", status_code=303)

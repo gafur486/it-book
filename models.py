@@ -8,13 +8,8 @@ class Topic(SQLModel, table=True):
     title: str
 
     body_md: str
+
     practical_md: str = ""
     groupwork_md: str = ""
     questions_md: str = ""
     code_md: str = ""
-
-class Book(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    title: str
-    file_path: str  # мисол: "books/test.pdf" (дар дохили static)
-    grade: Optional[int] = Field(default=None, index=True)

@@ -1,43 +1,51 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="card floating">
-  <div class="card-head">
-    <div style="display:flex; align-items:center; gap:10px;">
-      <i data-lucide="book-open" class="icon"></i>
-      <div>
-        <div class="tag">PDF</div>
-        <div style="font-weight:900;">РӮЙХАТИ КИТОБҲО</div>
+<div class="rounded-3xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/60">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <div class="text-xs tracking-wide text-slate-500 dark:text-slate-400">КИТОБҲО</div>
+      <div class="text-xl font-extrabold text-slate-900 dark:text-white">РӮЙХАТИ КИТОБҲО (PDF)</div>
+      <div class="mt-1 text-xs text-slate-500">
+        PDF папка: <span class="font-semibold">{{ request.app.state if false else "" }}</span>
+      </div>
+      <div class="mt-1 text-xs text-slate-500">
+        Номгузорӣ маслиҳат: <span class="font-semibold">9 - Номи китоб.pdf</span> ё <span class="font-semibold">10_Номи китоб.pdf</span>
       </div>
     </div>
 
-    <form method="get" action="/books" style="display:flex; gap:10px; align-items:center;">
-      <input class="input" name="q" value="{{ q }}" placeholder="Номи китобро нависед...">
-      <button class="btn" type="submit"><i data-lucide="search" class="icon"></i> Ҷустуҷӯ</button>
+    <form class="flex gap-2" method="get" action="/books">
+      <input name="q" value="{{ q }}"
+             class="w-72 max-w-full px-4 py-2 rounded-2xl border border-slate-200 bg-slate-50 outline-none
+                    dark:border-slate-800 dark:bg-slate-950/40"
+             placeholder="Номи китобро нависед...">
+      <button class="px-4 py-2 rounded-2xl border border-slate-200 bg-white font-bold hover:bg-slate-50
+                     dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">
+        ҶУСТУҶӮ
+      </button>
     </form>
   </div>
 
-  <div class="card-body" style="display:grid; gap:12px;">
+  <div class="mt-6 grid gap-3">
     {% if books %}
       {% for b in books %}
-        <a class="blockbox" href="/static/{{ b.file_path }}" target="_blank" rel="noopener">
-          <div style="font-weight:900;">{{ b.title }}</div>
-          <div class="tag" style="margin-top:6px;">
+        <a href="/pdf/{{ b.filename }}" target="_blank" rel="noopener"
+           class="block rounded-2xl border border-slate-200 p-4 hover:bg-slate-50
+                  dark:border-slate-800 dark:hover:bg-slate-950/40">
+          <div class="font-bold text-slate-900 dark:text-white">{{ b.title }}</div>
+          <div class="mt-1 text-sm text-slate-600 dark:text-slate-300">
             {% if b.grade %}Синф: {{ b.grade }}{% else %}Синф: —{% endif %}
           </div>
-          <div class="tag" style="margin-top:10px; color: var(--accent2);">Кушодан PDF →</div>
+          <div class="mt-2 text-xs text-indigo-600 dark:text-indigo-400">Кушодан PDF →</div>
         </a>
       {% endfor %}
     {% else %}
-      <div class="blockbox" style="text-align:center;">
+      <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center
+                  dark:border-slate-700 dark:bg-slate-950/30">
         Китоб ёфт нашуд.
       </div>
     {% endif %}
   </div>
 </div>
-
-<script>
-  if (window.lucide) lucide.createIcons();
-</script>
 
 {% endblock %}

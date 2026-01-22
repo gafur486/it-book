@@ -1,71 +1,111 @@
 {% extends "base.html" %}
 {% block content %}
-
-<div class="grid">
+<div class="grid gap-6 lg:grid-cols-[380px_1fr]">
   <!-- TOC -->
-  <section class="card floating">
-    <div class="card-head">
-      <div>
-        <div class="tag">TOC</div>
-        <div style="font-weight:900;letter-spacing:.2px;">СИНФ <span style="color:var(--accent)">{{ grade }}</span></div>
+  <section class="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-[0_10px_30px_rgba(2,6,23,0.08)]">
+    <div class="absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-indigo-500/10 via-fuchsia-500/10 to-cyan-500/10"></div>
+
+    <div class="relative p-5 border-b border-slate-100 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 shadow-[0_8px_18px_rgba(79,70,229,0.25)]"></div>
+        <div class="leading-tight">
+          <div class="text-[13px] tracking-wide text-slate-500">ФЕҲРИСТ</div>
+          <div class="font-extrabold text-slate-900">
+            СИНФ <span class="text-indigo-600">{{ grade }}</span>
+          </div>
+        </div>
       </div>
-      <div class="tag">{{ total }} мавзӯъ</div>
+
+      <div class="text-right">
+        <div class="text-[11px] text-slate-400">ҲАМАҢ МАВЗӮЪҲО</div>
+        <div class="font-semibold text-slate-700">
+          {{ total }} <span class="text-slate-400">дона</span>
+        </div>
+      </div>
     </div>
 
-    <div class="card-body">
-      <input class="input"
-             name="q"
-             type="search"
-             placeholder="ҶУСТУҶӮ..."
-             hx-get="/partials/toc?grade={{grade}}"
-             hx-trigger="keyup changed delay:250ms"
-             hx-target="#toc"
-             hx-swap="innerHTML"/>
+    <div class="p-5 space-y-4">
+      <!-- Search -->
+      <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 shadow-inner">
+        <svg class="h-5 w-5 text-slate-400" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M10.5 19a8.5 8.5 0 1 1 0-17 8.5 8.5 0 0 1 0 17Z" stroke="currentColor" stroke-width="2"/>
+          <path d="M16.8 16.8 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
 
-      <div id="toc" style="margin-top:12px; display:flex; flex-direction:column; gap:10px; max-height: 62vh; overflow:auto; padding-right: 4px;">
+        <input name="q" type="search"
+               class="w-full bg-transparent text-slate-900 placeholder:text-slate-400 outline-none"
+               placeholder="ҶУСТУҶӮ..."
+               hx-get="/partials/toc?grade={{grade}}"
+               hx-trigger="keyup changed delay:250ms"
+               hx-target="#toc"
+               hx-swap="innerHTML">
+      </div>
+
+      <div id="toc" class="space-y-2">
         {% include "partials/toc.html" %}
       </div>
 
-      <div class="footer-note">Маслиҳат: номи мавзӯъро нависед, то зуд ёбед.</div>
+      <div class="pt-2 text-xs text-slate-400">
+        Маслиҳат: номи мавзӯъро нависед, то зуд ёбед.
+      </div>
+
+      <div class="pt-2 flex gap-2 text-xs">
+        <a class="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50"
+           href="/?grade=9">Синф 9</a>
+        <a class="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50"
+           href="/?grade=10">Синф 10</a>
+        <a class="px-3 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50"
+           href="/?grade=11">Синф 11</a>
+      </div>
     </div>
   </section>
 
   <!-- PAGE -->
-  <section class="card floating">
-    <div class="card-head">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <i data-lucide="layout" class="icon"></i>
+  <section class="relative overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-[0_10px_30px_rgba(2,6,23,0.08)]">
+    <div class="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-gradient-to-br from-cyan-400/20 via-indigo-400/20 to-fuchsia-400/20 blur-2xl"></div>
+    <div class="absolute -left-28 -bottom-28 h-72 w-72 rounded-full bg-gradient-to-br from-amber-400/15 via-rose-400/15 to-purple-400/15 blur-2xl"></div>
+
+    <div class="relative p-5 border-b border-slate-100 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-2xl bg-slate-900 text-white grid place-items-center shadow-[0_10px_20px_rgba(2,6,23,0.18)]">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M7 4h10a2 2 0 0 1 2 2v14l-4-2-4 2-4-2-4 2V6a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <div>
-          <div class="tag">PAGE</div>
-          <div style="font-weight:900;letter-spacing:.2px;">Мавзӯъ ва шарҳ</div>
+          <div class="text-[11px] uppercase tracking-widest text-slate-400">САҲИФА</div>
+          <div class="font-bold text-slate-900">Мавзӯъ ва шарҳ</div>
         </div>
       </div>
 
-      <div class="tag">Формат: Markdown</div>
+      <div class="flex items-center gap-3 text-xs">
+        <span class="text-slate-400">TEXT CAPS</span>
+        <button type="button"
+                class="group inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 font-semibold text-slate-800 shadow-sm hover:bg-white hover:border-slate-300 active:scale-[0.99] transition"
+                onclick="document.getElementById('page').classList.toggle('uppercase-all')">
+          <span class="h-2.5 w-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-fuchsia-500"></span>
+          TOGGLE
+        </button>
+      </div>
     </div>
 
-    <div class="card-body">
+    <div id="page" class="relative p-6 md:p-8 {% if uppercase %}uppercase-all{% endif %}">
       {% if topic %}
-        {% include "partials/topic_card.html" %}
+        <div class="rounded-3xl border border-slate-200 bg-gradient-to-b from-white to-slate-50 shadow-[0_12px_28px_rgba(2,6,23,0.06)]">
+          <div class="p-6 md:p-7">
+            {% include "partials/topic_card.html" %}
+          </div>
+        </div>
       {% else %}
-        <h1 class="h1">Мавзӯъ интихоб нашудааст</h1>
-        <p class="p">Аз феҳрист як мавзӯъро интихоб кунед, то матн дар ин ҷо кушода шавад.</p>
-
-        <div class="blockbox">
-          <div class="tag">Функсияҳои нав</div>
-          <ul style="margin:10px 0 0; color: var(--muted); line-height:1.8;">
-            <li>⚙️ Танзимот: тема, иконка, забон</li>
-            <li>Панелҳои плавный ва floating</li>
-            <li>Омода барои синфҳои 10–11</li>
-          </ul>
+        <div class="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
+          <div class="mx-auto mb-4 h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-fuchsia-500 shadow-[0_10px_22px_rgba(79,70,229,0.22)]"></div>
+          <div class="text-slate-900 font-extrabold text-lg">Мавзӯъ интихоб нашудааст</div>
+          <div class="mt-2 text-slate-500">
+            Аз феҳрист як мавзӯъро интихоб кунед, то матн дар ин ҷо кушода шавад.
+          </div>
         </div>
       {% endif %}
     </div>
   </section>
 </div>
-
-<script>
-  if (window.lucide) lucide.createIcons();
-</script>
-
 {% endblock %}

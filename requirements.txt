@@ -4,4 +4,6 @@ sqlmodel==0.0.22
 jinja2==3.1.4
 python-multipart==0.0.9
 markdown-it-py==3.0.0
+pygments==2.18.0
 mdit-py-plugins==0.4.2
+httpx==0.27.2
