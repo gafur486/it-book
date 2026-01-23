@@ -268,20 +268,14 @@ def book_viewer(request: Request, filename: str):
 # -------- WIKI (Wikipedia) --------
 @app.get("/wiki", response_class=HTMLResponse)
 async def wiki_page(request: Request, q: str = ""):
-    """
-    Wikipedia search via MediaWiki API (stable).
-    Fixes Internal Server Error by:
-      - setting User-Agent
-      - robust error handling
-      - avoiding REST endpoint quirks
-    """
     results = []
     error = None
+    debug = None
 
     q = (q or "").strip()
     if q:
         try:
-            async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
+            async with httpx.AsyncClient(timeout=12.0, follow_redirects=True) as client:
                 api = "https://en.wikipedia.org/w/api.php"
                 params = {
                     "action": "query",
@@ -292,7 +286,6 @@ async def wiki_page(request: Request, q: str = ""):
                     "srlimit": 10,
                 }
                 headers = {
-                    # Wikipedia тавсия медиҳад User-Agent равшан бошад
                     "User-Agent": "IT-Book/1.0 (contact: admin@local)",
                     "Accept": "application/json",
                 }
@@ -304,26 +297,17 @@ async def wiki_page(request: Request, q: str = ""):
             for it in search_items:
                 title = it.get("title") or ""
                 snippet_html = it.get("snippet") or ""
-                # snippet бо HTML меояд — тоза мекунем
                 snippet_clean = re.sub(r"<.*?>", "", snippet_html)
                 page_url = f"https://en.wikipedia.org/wiki/{title.replace(' ', '_')}"
-                results.append({
-                    "title": title,
-                    "snippet": snippet_clean,
-                    "url": page_url
-                })
+                results.append({"title": title, "snippet": snippet_clean, "url": page_url})
 
-        except httpx.HTTPStatusError as e:
-            # HTTP error from Wikipedia
-            error = f"Wikipedia хато баргардонд (HTTP {e.response.status_code}). Боз кӯшиш кунед."
-        except httpx.RequestError:
-            # Network/DNS/timeout
-            error = "Пайвастшавӣ ба Wikipedia нашуд (интернет ё маҳдудият). Боз кӯшиш кунед."
-        except Exception:
-            error = "Wikipedia ҳоло дастрас нест ё ҷустуҷӯ хато дод. Боз кӯшиш кунед."
+        except Exception as e:
+            # Ба ҷои 500 — мо хаторо нишон медиҳем
+            error = "Wikipedia ҳоло дастрас нест ё ҷустуҷӯ хато дод."
+            debug = f"{type(e).__name__}: {str(e)}"
 
     tpl = env.get_template("wiki.html")
-    return tpl.render(title="Wikipedia", request=request, q=q, results=results, error=error)
+    return tpl.render(title="Wikipedia", request=request, q=q, results=results, error=error, debug=debug)
 
 # -------- ADMIN AUTH --------
 @app.get("/admin/login", response_class=HTMLResponse)
