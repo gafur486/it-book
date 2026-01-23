@@ -268,25 +268,57 @@ def book_viewer(request: Request, filename: str):
 # -------- WIKI (Wikipedia) --------
 @app.get("/wiki", response_class=HTMLResponse)
 async def wiki_page(request: Request, q: str = ""):
+    """
+    Wikipedia search via MediaWiki API (stable).
+    Fixes Internal Server Error by:
+      - setting User-Agent
+      - robust error handling
+      - avoiding REST endpoint quirks
+    """
     results = []
     error = None
 
-    if q.strip():
+    q = (q or "").strip()
+    if q:
         try:
-            async with httpx.AsyncClient(timeout=8.0) as client:
-                url = "https://en.wikipedia.org/w/rest.php/v1/search/title"
-                r = await client.get(url, params={"q": q.strip(), "limit": 8})
+            async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
+                api = "https://en.wikipedia.org/w/api.php"
+                params = {
+                    "action": "query",
+                    "list": "search",
+                    "srsearch": q,
+                    "format": "json",
+                    "utf8": 1,
+                    "srlimit": 10,
+                }
+                headers = {
+                    # Wikipedia тавсия медиҳад User-Agent равшан бошад
+                    "User-Agent": "IT-Book/1.0 (contact: admin@local)",
+                    "Accept": "application/json",
+                }
+                r = await client.get(api, params=params, headers=headers)
                 r.raise_for_status()
                 data = r.json()
 
-            pages = data.get("pages", []) or []
-            for p in pages:
-                title = p.get("title") or ""
-                excerpt = p.get("excerpt") or ""
-                excerpt_clean = re.sub(r"<.*?>", "", excerpt)
-                key = p.get("key") or ""
-                page_url = f"https://en.wikipedia.org/wiki/{key}" if key else "https://en.wikipedia.org"
-                results.append({"title": title, "snippet": excerpt_clean, "url": page_url})
+            search_items = (((data or {}).get("query") or {}).get("search")) or []
+            for it in search_items:
+                title = it.get("title") or ""
+                snippet_html = it.get("snippet") or ""
+                # snippet бо HTML меояд — тоза мекунем
+                snippet_clean = re.sub(r"<.*?>", "", snippet_html)
+                page_url = f"https://en.wikipedia.org/wiki/{title.replace(' ', '_')}"
+                results.append({
+                    "title": title,
+                    "snippet": snippet_clean,
+                    "url": page_url
+                })
+
+        except httpx.HTTPStatusError as e:
+            # HTTP error from Wikipedia
+            error = f"Wikipedia хато баргардонд (HTTP {e.response.status_code}). Боз кӯшиш кунед."
+        except httpx.RequestError:
+            # Network/DNS/timeout
+            error = "Пайвастшавӣ ба Wikipedia нашуд (интернет ё маҳдудият). Боз кӯшиш кунед."
         except Exception:
             error = "Wikipedia ҳоло дастрас нест ё ҷустуҷӯ хато дод. Боз кӯшиш кунед."
 
