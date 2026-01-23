@@ -6,10 +6,10 @@
     <div>
       <div class="text-xs tracking-wide text-slate-500 dark:text-slate-400">КИТОБҲО</div>
       <div class="text-xl font-extrabold text-slate-900 dark:text-white">РӮЙХАТИ КИТОБҲО (PDF)</div>
-      <div class="mt-1 text-xs text-slate-500">
-        PDF папка: <span class="font-semibold">{{ request.app.state if false else "" }}</span>
+      <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+        Танҳо китобҳои тасдиқшуда нишон дода мешаванд.
       </div>
-      <div class="mt-1 text-xs text-slate-500">
+      <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">
         Номгузорӣ маслиҳат: <span class="font-semibold">9 - Номи китоб.pdf</span> ё <span class="font-semibold">10_Номи китоб.pdf</span>
       </div>
     </div>
@@ -17,7 +17,7 @@
     <form class="flex gap-2" method="get" action="/books">
       <input name="q" value="{{ q }}"
              class="w-72 max-w-full px-4 py-2 rounded-2xl border border-slate-200 bg-slate-50 outline-none
-                    dark:border-slate-800 dark:bg-slate-950/40"
+                    dark:border-slate-800 dark:bg-slate-950/40 dark:text-white"
              placeholder="Номи китобро нависед...">
       <button class="px-4 py-2 rounded-2xl border border-slate-200 bg-white font-bold hover:bg-slate-50
                      dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">
@@ -29,14 +29,14 @@
   <div class="mt-6 grid gap-3">
     {% if books %}
       {% for b in books %}
-        <a href="/pdf/{{ b.filename }}" target="_blank" rel="noopener"
+        <a href="/book/{{ b.filename }}"
            class="block rounded-2xl border border-slate-200 p-4 hover:bg-slate-50
                   dark:border-slate-800 dark:hover:bg-slate-950/40">
           <div class="font-bold text-slate-900 dark:text-white">{{ b.title }}</div>
           <div class="mt-1 text-sm text-slate-600 dark:text-slate-300">
             {% if b.grade %}Синф: {{ b.grade }}{% else %}Синф: —{% endif %}
           </div>
-          <div class="mt-2 text-xs text-indigo-600 dark:text-indigo-400">Кушодан PDF →</div>
+          <div class="mt-2 text-xs text-indigo-600 dark:text-indigo-400">ХОНДАН →</div>
         </a>
       {% endfor %}
     {% else %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="rounded-3xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/60 overflow-hidden">
+  <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <div class="text-xs text-slate-500 dark:text-slate-400">КИТОБ</div>
+      <div class="text-lg font-extrabold text-slate-900 dark:text-white">{{ book_title }}</div>
+      <div class="text-xs text-slate-500 dark:text-slate-400">
+        {% if grade %}Синф: {{ grade }}{% else %}Синф: —{% endif %}
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
+                dark:border-slate-800 dark:hover:border-slate-600"
+         href="/books">← Бозгашт</a>
+
+      <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
+                dark:border-slate-800 dark:hover:border-slate-600"
+         href="/pdf/{{ filename }}" target="_blank" rel="noopener">
+        Кушодан дар таб
+      </a>
+
+      <button class="px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+              onclick="toggleFull()">
+        ЭКРАНИ КАЛОН
+      </button>
+    </div>
+  </div>
+
+  <div id="viewerWrap" class="w-full">
+    <iframe id="pdfFrame"
+            src="/pdf/{{ filename }}#view=FitH"
+            class="w-full"
+            style="height: calc(100vh - 260px); border:0;"
+            loading="lazy">
+    </iframe>
+  </div>
+</div>
+
+<script>
+  function toggleFull(){
+    const wrap = document.getElementById("viewerWrap");
+    const frame = document.getElementById("pdfFrame");
+    if(!wrap || !frame) return;
+
+    // Fullscreen API
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      wrap.requestFullscreen?.();
+    }
+  }
+
+  // Вақте fullscreen шуд — баландиро калон мекунем
+  document.addEventListener("fullscreenchange", () => {
+    const frame = document.getElementById("pdfFrame");
+    if(!frame) return;
+    if (document.fullscreenElement) {
+      frame.style.height = "100vh";
+    } else {
+      frame.style.height = "calc(100vh - 260px)";
+    }
+  });
+</script>
+
+{% endblock %}

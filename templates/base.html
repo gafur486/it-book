@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="tg">
+<html lang="tg" class="dark">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -8,33 +8,42 @@
   <link rel="stylesheet" href="/static/style.css">
   <link rel="stylesheet" href="/static/app.css"/>
 
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- HTMX -->
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 </head>
 
-<body class="bg-slate-950 text-slate-100">
-  <header class="sticky top-0 z-10 border-b border-slate-800 bg-slate-950/90 backdrop-blur">
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+  <header class="sticky top-0 z-10 border-b border-slate-200 bg-white/90 backdrop-blur
+                 dark:border-slate-800 dark:bg-slate-950/90">
     <div class="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between gap-3">
       <div>
         <div class="text-lg font-extrabold tracking-tight">КИТОБЧАИ ТЕХНОЛОГИЯҲОИ ИТТИЛООТӢ</div>
-        <div class="text-xs text-slate-400">ФЕҲРИСТ + САҲИФАҲО + КИТОБҲО + WIKIPEDIA</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">ФЕҲРИСТ + САҲИФАҲО + КИТОБҲО + WIKIPEDIA</div>
       </div>
 
       <div class="flex items-center gap-3">
         <!-- Clock -->
-        <div class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-800">
-          <span class="text-xs text-slate-400">Dushanbe</span>
+        <div class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800">
+          <span class="text-xs text-slate-500 dark:text-slate-400">Dushanbe</span>
           <span id="clock" class="font-semibold"></span>
         </div>
 
+        <!-- Theme toggle -->
+        <button id="themeBtn"
+                class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400
+                       dark:border-slate-800 dark:hover:border-slate-600">
+          РЕЖИМ
+        </button>
+
         <div class="flex gap-2">
-          <a class="px-3 py-2 rounded-xl border border-slate-800 hover:border-slate-600" href="/">КИТОБ</a>
-          <a class="px-3 py-2 rounded-xl border border-slate-800 hover:border-slate-600" href="/books">КИТОБҲО</a>
-          <a class="px-3 py-2 rounded-xl border border-slate-800 hover:border-slate-600" href="/wiki">WIKI</a>
-          <a class="px-3 py-2 rounded-xl border border-slate-800 hover:border-slate-600" href="/admin">АДМИН</a>
+          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400
+                    dark:border-slate-800 dark:hover:border-slate-600" href="/">КИТОБ</a>
+          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400
+                    dark:border-slate-800 dark:hover:border-slate-600" href="/books">КИТОБҲО</a>
+          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400
+                    dark:border-slate-800 dark:hover:border-slate-600" href="/wiki">WIKI</a>
+          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400
+                    dark:border-slate-800 dark:hover:border-slate-600" href="/admin">АДМИН</a>
         </div>
       </div>
     </div>
@@ -44,66 +53,88 @@
     {% block content %}{% endblock %}
   </main>
 
-  <!-- Footer -->
-  <footer class="border-t border-slate-800 bg-slate-950/80">
+  <footer class="border-t border-slate-200 bg-white/80 dark:border-slate-800 dark:bg-slate-950/80">
     <div class="mx-auto max-w-6xl px-4 py-8">
       <div class="grid gap-6 md:grid-cols-2">
         <div>
           <div class="font-extrabold text-lg">Убайдуллоев Ғафурҷон</div>
-          <div class="text-sm text-slate-400 mt-1">
-            Тамос ва шабакаҳо
-          </div>
+          <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">Тамос ва шабакаҳо</div>
         </div>
 
         <div class="flex flex-wrap gap-2 md:justify-end">
-          <!-- Телефон -->
-          <a class="px-4 py-2 rounded-xl border border-slate-800 hover:border-slate-600"
+          <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
+                    dark:border-slate-800 dark:hover:border-slate-600"
              href="tel:+992001666922">
             +992 001 66 69 22 (Занг)
           </a>
 
-          <!-- WhatsApp -->
-          <a class="px-4 py-2 rounded-xl border border-slate-800 hover:border-slate-600"
+          <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
+                    dark:border-slate-800 dark:hover:border-slate-600"
              href="https://wa.me/992001666922" target="_blank" rel="noopener">
             WhatsApp
           </a>
 
-          <!-- Telegram (deep link барои телефон) -->
-          <a class="px-4 py-2 rounded-xl border border-slate-800 hover:border-slate-600"
+          <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
+                    dark:border-slate-800 dark:hover:border-slate-600"
              href="tg://resolve?phone=992001666922">
             Telegram
           </a>
 
-          <!-- Instagram -->
-          <a class="px-4 py-2 rounded-xl border border-slate-800 hover:border-slate-600"
+          <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
+                    dark:border-slate-800 dark:hover:border-slate-600"
              href="https://instagram.com/islamicbooks777" target="_blank" rel="noopener">
             Instagram: islamicbooks777
+          </a>
+
+          <!-- ВКонтакте (URL-ро иваз кунед) -->
+          <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
+                    dark:border-slate-800 dark:hover:border-slate-600"
+             href="https://vk.com/" target="_blank" rel="noopener">
+            ВКонтакте
           </a>
         </div>
       </div>
 
-      <div class="mt-6 text-xs text-slate-500">
+      <div class="mt-6 text-xs text-slate-500 dark:text-slate-500">
         © {{ 2026 }} IT-Book. Ҳама ҳуқуқ маҳфуз.
       </div>
     </div>
   </footer>
 
   <script>
+    // CLOCK
     (function() {
       const el = document.getElementById("clock");
       function tick() {
         const now = new Date();
-        // Timezone Asia/Dushanbe
         const fmt = new Intl.DateTimeFormat("ru-RU", {
           timeZone: "Asia/Dushanbe",
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit"
         });
-        el.textContent = fmt.format(now);
+        if (el) el.textContent = fmt.format(now);
       }
       tick();
       setInterval(tick, 1000);
+    })();
+
+    // THEME (dark/light)
+    (function(){
+      const root = document.documentElement;
+      const key = "itbook_theme";
+      const saved = localStorage.getItem(key);
+
+      if (saved === "light") root.classList.remove("dark");
+      if (saved === "dark") root.classList.add("dark");
+
+      const btn = document.getElementById("themeBtn");
+      if (btn) {
+        btn.addEventListener("click", () => {
+          root.classList.toggle("dark");
+          localStorage.setItem(key, root.classList.contains("dark") ? "dark" : "light");
+        });
+      }
     })();
   </script>
 </body>

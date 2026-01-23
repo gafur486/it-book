@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Optional, List, Dict
 
 import httpx
-from fastapi import FastAPI, Request, Depends, Form
+from fastapi import FastAPI, Request, Depends, Form, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlmodel import Session, select
@@ -21,33 +21,33 @@ from models import Topic
 # =========================
 # CONFIG
 # =========================
-ADMIN_LOGIN = "abdu0004"
-ADMIN_PASSWORD = "12345678"
+# Муҳим: беҳтараш инҳоро ба ENV гузоред (Render / .env)
+ADMIN_LOGIN = os.getenv("ADMIN_LOGIN", "abdu0004")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "12345678")
 
-# Барои имзои cookie (тағйир диҳед дар сервер)
 SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_ME_SUPER_SECRET_KEY_2026").encode("utf-8")
 
-# PDF folder:
-# 1) Агар PDF_BOOK_DIR set шавад -> ҳамон
-# 2) Агар не -> Desktop/pdf-book (Windows) ё ./pdf-book (дигар)
+# PDF root:
 _default_desktop_pdf = str(Path.home() / "Desktop" / "pdf-book")
-PDF_BOOK_DIR = Path(os.getenv("PDF_BOOK_DIR", _default_desktop_pdf))
-if not PDF_BOOK_DIR.exists():
-    # fallback: project folder
-    PDF_BOOK_DIR = Path("pdf-book")
+PDF_ROOT = Path(os.getenv("PDF_BOOK_DIR", _default_desktop_pdf))
+if not PDF_ROOT.exists():
+    PDF_ROOT = Path("pdf-book")
+PDF_ROOT.mkdir(parents=True, exist_ok=True)
 
-PDF_BOOK_DIR.mkdir(parents=True, exist_ok=True)
+PDF_PENDING = PDF_ROOT / "pending"
+PDF_APPROVED = PDF_ROOT / "approved"
+PDF_PENDING.mkdir(parents=True, exist_ok=True)
+PDF_APPROVED.mkdir(parents=True, exist_ok=True)
 
 # =========================
 # APP INIT
 # =========================
 app = FastAPI()
 
-# static folder (css, images, etc.)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Serve PDFs directly from pdf-book folder
-app.mount("/pdf", StaticFiles(directory=str(PDF_BOOK_DIR)), name="pdf")
+# Serve ONLY approved PDFs
+app.mount("/pdf", StaticFiles(directory=str(PDF_APPROVED)), name="pdf")
 
 env = Environment(
     loader=FileSystemLoader("templates"),
@@ -127,15 +127,12 @@ def on_startup():
             s.commit()
 
 # =========================
-# PDF BOOKS: auto-scan folder
+# PDF BOOKS
 # =========================
 _pdf_grade_re = re.compile(r"^\s*(\d{1,2})[\s_\-]+(.+?)\.pdf\s*$", re.IGNORECASE)
 
-def list_pdf_books(q: str = "") -> List[Dict]:
+def _parse_pdf_name(filename: str) -> Dict:
     """
-    Returns list of dict:
-      { title, filename, grade }
-    Filename served via /pdf/{filename}
     Title derived from filename.
     Supported filename formats:
       "9 - Китоби тестӣ.pdf"
@@ -143,30 +140,35 @@ def list_pdf_books(q: str = "") -> List[Dict]:
       "11-Modeling.pdf"
     If no grade prefix -> grade = None
     """
+    title = filename[:-4] if filename.lower().endswith(".pdf") else filename
+    grade = None
+    m = _pdf_grade_re.match(filename)
+    if m:
+        grade = int(m.group(1))
+        title = m.group(2).strip()
+    return {"title": title, "grade": grade}
+
+def list_pdf_books(q: str = "") -> List[Dict]:
     items: List[Dict] = []
-    if not PDF_BOOK_DIR.exists():
-        return items
+    for p in sorted(PDF_APPROVED.glob("*.pdf")):
+        meta = _parse_pdf_name(p.name)
+        title = meta["title"]
+        grade = meta["grade"]
 
-    for p in sorted(PDF_BOOK_DIR.glob("*.pdf")):
-        name = p.name
-        title = name[:-4]  # remove .pdf
-        grade = None
-
-        m = _pdf_grade_re.match(name)
-        if m:
-            grade = int(m.group(1))
-            title = m.group(2).strip()
-
-        if q:
-            if q.strip().lower() not in title.lower():
-                continue
+        if q and q.strip().lower() not in title.lower():
+            continue
 
         items.append({
             "title": title,
-            "filename": name,
+            "filename": p.name,
             "grade": grade
         })
     return items
+
+def file_exists_approved(filename: str) -> bool:
+    if "/" in filename or "\\" in filename or ".." in filename:
+        return False
+    return (PDF_APPROVED / filename).exists()
 
 # =========================
 # ROUTES
@@ -247,20 +249,31 @@ def books_page(request: Request, q: str = ""):
     tpl = env.get_template("books.html")
     return tpl.render(title="Китобҳо", request=request, books=books, q=q)
 
+# PDF reader page (fullscreen-ish)
+@app.get("/book/{filename}", response_class=HTMLResponse)
+def book_viewer(request: Request, filename: str):
+    if not file_exists_approved(filename):
+        raise HTTPException(status_code=404, detail="PDF not found")
+
+    meta = _parse_pdf_name(filename)
+    tpl = env.get_template("pdf_viewer.html")
+    return tpl.render(
+        title=meta["title"],
+        request=request,
+        filename=filename,
+        book_title=meta["title"],
+        grade=meta["grade"],
+    )
+
 # -------- WIKI (Wikipedia) --------
 @app.get("/wiki", response_class=HTMLResponse)
 async def wiki_page(request: Request, q: str = ""):
-    """
-    Wikipedia search via REST API.
-    """
     results = []
     error = None
 
     if q.strip():
         try:
             async with httpx.AsyncClient(timeout=8.0) as client:
-                # Wikipedia REST search endpoint
-                # returns JSON with pages in "pages"
                 url = "https://en.wikipedia.org/w/rest.php/v1/search/title"
                 r = await client.get(url, params={"q": q.strip(), "limit": 8})
                 r.raise_for_status()
@@ -270,15 +283,10 @@ async def wiki_page(request: Request, q: str = ""):
             for p in pages:
                 title = p.get("title") or ""
                 excerpt = p.get("excerpt") or ""
-                # excerpt comes with HTML tags sometimes; keep it simple
                 excerpt_clean = re.sub(r"<.*?>", "", excerpt)
                 key = p.get("key") or ""
                 page_url = f"https://en.wikipedia.org/wiki/{key}" if key else "https://en.wikipedia.org"
-                results.append({
-                    "title": title,
-                    "snippet": excerpt_clean,
-                    "url": page_url
-                })
+                results.append({"title": title, "snippet": excerpt_clean, "url": page_url})
         except Exception:
             error = "Wikipedia ҳоло дастрас нест ё ҷустуҷӯ хато дод. Боз кӯшиш кунед."
 
@@ -292,11 +300,7 @@ def admin_login_get(request: Request, msg: str = ""):
     return tpl.render(title="Админ — Login", request=request, msg=msg)
 
 @app.post("/admin/login")
-def admin_login_post(
-    request: Request,
-    login: str = Form(...),
-    password: str = Form(...),
-):
+def admin_login_post(request: Request, login: str = Form(...), password: str = Form(...)):
     if login.strip() == ADMIN_LOGIN and password == ADMIN_PASSWORD:
         resp = RedirectResponse("/admin", status_code=303)
         resp.set_cookie(
@@ -304,10 +308,9 @@ def admin_login_post(
             _sign("admin"),
             httponly=True,
             samesite="lax",
-            max_age=60 * 60 * 12,  # 12 соат
+            max_age=60 * 60 * 12,
         )
         return resp
-
     return RedirectResponse("/admin/login?msg=Хато:+login+ё+парол", status_code=303)
 
 @app.get("/admin/logout")
@@ -321,10 +324,51 @@ def admin(request: Request):
     guard = require_admin(request)
     if guard:
         return guard
-
     tpl = env.get_template("admin.html")
-    return tpl.render(title="Админ", request=request, pdf_dir=str(PDF_BOOK_DIR))
+    return tpl.render(
+        title="Админ",
+        request=request,
+        pdf_root=str(PDF_ROOT),
+        pending=str(PDF_PENDING),
+        approved=str(PDF_APPROVED),
+    )
 
+# Pending PDFs list
+@app.get("/admin/pdfs", response_class=HTMLResponse)
+def admin_pdfs(request: Request):
+    guard = require_admin(request)
+    if guard:
+        return guard
+
+    pending = sorted(PDF_PENDING.glob("*.pdf"))
+    tpl = env.get_template("admin_pdfs.html")
+    return tpl.render(title="Админ — PDF", request=request, pending=pending)
+
+@app.post("/admin/pdfs/approve")
+def approve_pdf(request: Request, filename: str = Form(...)):
+    guard = require_admin(request)
+    if guard:
+        return guard
+
+    if "/" in filename or "\\" in filename or ".." in filename:
+        return RedirectResponse("/admin/pdfs", status_code=303)
+
+    src = PDF_PENDING / filename
+    dst = PDF_APPROVED / filename
+    if src.exists():
+        # Агар файл бо ҳамин ном дар approved бошад, номи нав диҳем:
+        if dst.exists():
+            stem = dst.stem
+            suffix = dst.suffix
+            i = 2
+            while (PDF_APPROVED / f"{stem} ({i}){suffix}").exists():
+                i += 1
+            dst = PDF_APPROVED / f"{stem} ({i}){suffix}"
+        src.rename(dst)
+
+    return RedirectResponse("/admin/pdfs", status_code=303)
+
+# Create topic
 @app.post("/admin/create")
 def admin_create(
     request: Request,
