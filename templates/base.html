@@ -1,23 +1,17 @@
 <!doctype html>
-<html lang="tg" class="dark">
+<html lang="en" class="dark">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>{{ title or "Китобчаи ИТ" }}</title>
+  <title>{{ title or "English Learning" }}</title>
 
   <link rel="stylesheet" href="/static/style.css">
   <link rel="stylesheet" href="/static/app.css"/>
 
-  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- HTMX -->
-  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
-
   <style>
-    /* Акцент барои тугмаҳо/нишонаҳо аз CSS variables */
     .accent-ring:focus { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent); }
-    .accent-border { border-color: color-mix(in srgb, var(--accent) 55%, rgb(148 163 184 / .25)); }
   </style>
 </head>
 
@@ -26,58 +20,32 @@
                  dark:border-slate-800 dark:bg-slate-950/90">
     <div class="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between gap-3">
       <div>
-        <div class="text-lg font-extrabold tracking-tight" data-i18n="brandTitle">КИТОБЧАИ ТЕХНОЛОГИЯҲОИ ИТТИЛООТӢ</div>
-        <div class="text-xs text-slate-500 dark:text-slate-400" data-i18n="brandSub">ФЕҲРИСТ + САҲИФАҲО + КИТОБҲО + WIKIPEDIA</div>
+        <div class="text-lg font-extrabold tracking-tight">ENGLISH LEARNING</div>
+        <div class="text-xs text-slate-500 dark:text-slate-400">Lessons + Practice + Books + Admin</div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <!-- Clock -->
-        <div class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800">
-          <span class="text-xs text-slate-500 dark:text-slate-400">Dushanbe</span>
-          <span id="clock" class="font-semibold"></span>
-        </div>
-
-        <!-- Theme toggle -->
+      <div class="flex items-center gap-2">
         <button id="themeBtn"
                 class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                       dark:border-slate-800 dark:hover:border-slate-600 accent-ring"
-                data-i18n="mode">
-          РЕЖИМ
+                       dark:border-slate-800 dark:hover:border-slate-600 accent-ring">
+          Mode
         </button>
 
-        <!-- Settings button -->
         <button id="openSettings"
                 class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400
                        dark:border-slate-800 dark:hover:border-slate-600 accent-ring"
-                title="Настройка">
-          <span class="inline-flex items-center gap-2">
-            <!-- Gear icon -->
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="2"/>
-              <path d="M19.4 15a7.9 7.9 0 0 0 .1-2l2-1.2-2-3.4-2.3.7a8 8 0 0 0-1.7-1l-.3-2.4H11l-.3 2.4a8 8 0 0 0-1.7 1L6.7 8.4 4.7 11.8l2 1.2a7.9 7.9 0 0 0 .1 2l-2 1.2 2 3.4 2.3-.7a8 8 0 0 0 1.7 1l.3 2.4h4.2l.3-2.4a8 8 0 0 0 1.7-1l2.3.7 2-3.4-2-1.2Z"
-                    stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-            </svg>
-            <span class="hidden sm:inline" data-i18n="settings">НАСТРОЙКА</span>
-          </span>
+                title="Settings">
+          Settings
         </button>
 
-        <div class="flex gap-2">
-          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                    dark:border-slate-800 dark:hover:border-slate-600"
-             href="/" data-i18n="navBook">КИТОБ</a>
+        <a class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400 dark:border-slate-800 dark:hover:border-slate-600"
+           href="/">Home</a>
 
-          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                    dark:border-slate-800 dark:hover:border-slate-600"
-             href="/books" data-i18n="navBooks">КИТОБҲО</a>
+        <a class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400 dark:border-slate-800 dark:hover:border-slate-600"
+           href="/books">Books</a>
 
-          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                    dark:border-slate-800 dark:hover:border-slate-600"
-             href="/wiki" data-i18n="navWiki">WIKI</a>
-
-          <a class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                    dark:border-slate-800 dark:hover:border-slate-600"
-             href="/admin" data-i18n="navAdmin">АДМИН</a>
-        </div>
+        <a class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400 dark:border-slate-800 dark:hover:border-slate-600"
+           href="/admin">Admin</a>
       </div>
     </div>
   </header>
@@ -86,114 +54,30 @@
     {% block content %}{% endblock %}
   </main>
 
-  <footer class="border-t border-slate-200 bg-white/80 dark:border-slate-800 dark:bg-slate-950/80">
-    <div class="mx-auto max-w-6xl px-4 py-8">
-      <div class="grid gap-6 md:grid-cols-2">
-        <div>
-          <div class="font-extrabold text-lg">Убайдуллоев Ғафурҷон</div>
-          <div class="text-sm text-slate-500 dark:text-slate-400 mt-1" data-i18n="contacts">Тамос ва шабакаҳо</div>
-        </div>
-
-        <div class="flex flex-wrap gap-2 md:justify-end">
-          <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                    dark:border-slate-800 dark:hover:border-slate-600"
-             href="tel:+992001666922">
-            +992 001 66 69 22
-          </a>
-
-          <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                    dark:border-slate-800 dark:hover:border-slate-600"
-             href="https://wa.me/992001666922" target="_blank" rel="noopener">
-            WhatsApp
-          </a>
-
-          <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                    dark:border-slate-800 dark:hover:border-slate-600"
-             href="tg://resolve?phone=992001666922">
-            Telegram
-          </a>
-
-          <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                    dark:border-slate-800 dark:hover:border-slate-600"
-             href="https://instagram.com/islamicbooks777" target="_blank" rel="noopener">
-            Instagram
-          </a>
-
-          <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                    dark:border-slate-800 dark:hover:border-slate-600"
-             href="https://vk.com/" target="_blank" rel="noopener">
-            VK
-          </a>
-        </div>
-      </div>
-
-      <div class="mt-6 text-xs text-slate-500 dark:text-slate-500">
-        © {{ 2026 }} IT-Book. Ҳама ҳуқуқ маҳфуз.
-      </div>
-    </div>
-  </footer>
-
-  <!-- SETTINGS MODAL -->
+  <!-- SETTINGS MODAL (simple) -->
   <div id="settingsModal" class="fixed inset-0 hidden items-start justify-center p-4 bg-black/40 backdrop-blur-sm z-[100]">
-    <div class="w-full max-w-2xl mt-16 rounded-3xl border border-slate-200 bg-white shadow-xl overflow-hidden
+    <div class="w-full max-w-xl mt-16 rounded-3xl border border-slate-200 bg-white shadow-xl overflow-hidden
                 dark:border-slate-800 dark:bg-slate-950">
-      <div class="p-4 border-b border-slate-200 flex items-center justify-between
-                  dark:border-slate-800">
-        <div class="font-extrabold text-slate-900 dark:text-white" data-i18n="settingsTitle">НАСТРОЙКА</div>
-        <button id="closeSettings"
-                class="px-3 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                       dark:border-slate-800 dark:hover:border-slate-600">
-          ✕
-        </button>
+      <div class="p-4 border-b border-slate-200 flex items-center justify-between dark:border-slate-800">
+        <div class="font-extrabold">Settings</div>
+        <button id="closeSettings" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800">✕</button>
       </div>
 
-      <div class="p-4 grid gap-4 md:grid-cols-2">
-        <!-- Language -->
+      <div class="p-4 space-y-4">
         <div class="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
-          <div class="font-bold mb-2" data-i18n="lang">Забон</div>
+          <div class="font-bold mb-2">Accent color</div>
           <div class="flex flex-wrap gap-2">
-            <button class="langBtn px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800" data-lang="tg">Тоҷикӣ</button>
-            <button class="langBtn px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800" data-lang="ru">Рус</button>
-            <button class="langBtn px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800" data-lang="en">EN</button>
-          </div>
-          <div class="mt-2 text-xs text-slate-500 dark:text-slate-400" data-i18n="langNote">
-            Забон барои матнҳои меню ва панел татбиқ мешавад.
+            <button class="accentBtn px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800" data-accent="#7c3aed">Violet</button>
+            <button class="accentBtn px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800" data-accent="#2563eb">Blue</button>
+            <button class="accentBtn px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800" data-accent="#f97316">Orange</button>
+            <button class="accentBtn px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800" data-accent="#0f172a">Dark</button>
           </div>
         </div>
 
-        <!-- Accent / Panel color -->
         <div class="rounded-2xl border border-slate-200 p-4 dark:border-slate-800">
-          <div class="font-bold mb-2" data-i18n="accent">Ранги панел (Accent)</div>
-          <div class="flex flex-wrap gap-2">
-            <button class="accentBtn px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800"
-                    data-accent="#7c3aed" data-accent2="#06b6d4">Фиолет/Сияҳ</button>
-            <button class="accentBtn px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800"
-                    data-accent="#2563eb" data-accent2="#22c55e">Blue/Green</button>
-            <button class="accentBtn px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800"
-                    data-accent="#f97316" data-accent2="#e11d48">Orange/Rose</button>
-            <button class="accentBtn px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800"
-                    data-accent="#0f172a" data-accent2="#64748b">Dark/Silver</button>
-          </div>
-          <div class="mt-2 text-xs text-slate-500 dark:text-slate-400" data-i18n="accentNote">
-            Ранги тугмаҳо ва highlight-ҳо тағйир меёбад.
-          </div>
-        </div>
-
-        <!-- Support -->
-        <div class="rounded-2xl border border-slate-200 p-4 dark:border-slate-800 md:col-span-2">
-          <div class="font-bold mb-2" data-i18n="support">Служба поддержки</div>
-          <div class="flex flex-wrap gap-2">
-            <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400 dark:border-slate-800 dark:hover:border-slate-600"
-               href="tel:+992001666922">Занг</a>
-            <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400 dark:border-slate-800 dark:hover:border-slate-600"
-               href="https://wa.me/992001666922" target="_blank" rel="noopener">WhatsApp</a>
-            <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400 dark:border-slate-800 dark:hover:border-slate-600"
-               href="tg://resolve?phone=992001666922">Telegram</a>
-            <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400 dark:border-slate-800 dark:hover:border-slate-600"
-               href="https://vk.com/" target="_blank" rel="noopener">VK</a>
-          </div>
-          <div class="mt-2 text-xs text-slate-500 dark:text-slate-400" data-i18n="supportNote">
-            Агар ягон чиз кор накунад — нависед, зуд ҳал мекунем.
+          <div class="font-bold mb-2">Support</div>
+          <div class="text-sm text-slate-500 dark:text-slate-400">
+            Phone/WhatsApp/Telegram links can stay here as before.
           </div>
         </div>
       </div>
@@ -201,162 +85,42 @@
   </div>
 
   <script>
-    // CLOCK
-    (function() {
-      const el = document.getElementById("clock");
-      function tick() {
-        const now = new Date();
-        const fmt = new Intl.DateTimeFormat("ru-RU", {
-          timeZone: "Asia/Dushanbe",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit"
-        });
-        if (el) el.textContent = fmt.format(now);
-      }
-      tick();
-      setInterval(tick, 1000);
-    })();
-
-    // THEME (dark/light)
+    // theme
     (function(){
       const root = document.documentElement;
       const key = "itbook_theme";
       const saved = localStorage.getItem(key);
       if (saved === "light") root.classList.remove("dark");
       if (saved === "dark") root.classList.add("dark");
-
-      const btn = document.getElementById("themeBtn");
-      if (btn) {
-        btn.addEventListener("click", () => {
-          root.classList.toggle("dark");
-          localStorage.setItem(key, root.classList.contains("dark") ? "dark" : "light");
-        });
-      }
+      document.getElementById("themeBtn")?.addEventListener("click", () => {
+        root.classList.toggle("dark");
+        localStorage.setItem(key, root.classList.contains("dark") ? "dark" : "light");
+      });
     })();
 
-    // SETTINGS MODAL OPEN/CLOSE
+    // settings modal
     (function(){
       const modal = document.getElementById("settingsModal");
       const openBtn = document.getElementById("openSettings");
       const closeBtn = document.getElementById("closeSettings");
-
-      function open(){
-        if (!modal) return;
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-      }
-      function close(){
-        if (!modal) return;
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-      }
-
+      function open(){ modal?.classList.remove("hidden"); modal?.classList.add("flex"); }
+      function close(){ modal?.classList.add("hidden"); modal?.classList.remove("flex"); }
       openBtn?.addEventListener("click", open);
       closeBtn?.addEventListener("click", close);
       modal?.addEventListener("click", (e) => { if (e.target === modal) close(); });
       document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
     })();
 
-    // ACCENT COLOR (panel/highlight)
+    // accent
     (function(){
       const keyA = "itbook_accent";
-      const keyA2 = "itbook_accent2";
       const root = document.documentElement;
-
       const savedA = localStorage.getItem(keyA);
-      const savedA2 = localStorage.getItem(keyA2);
-
       if (savedA) root.style.setProperty("--accent", savedA);
-      if (savedA2) root.style.setProperty("--accent2", savedA2);
-
       document.querySelectorAll(".accentBtn").forEach(btn => {
         btn.addEventListener("click", () => {
           const a = btn.getAttribute("data-accent");
-          const a2 = btn.getAttribute("data-accent2");
           if (a) { root.style.setProperty("--accent", a); localStorage.setItem(keyA, a); }
-          if (a2) { root.style.setProperty("--accent2", a2); localStorage.setItem(keyA2, a2); }
-        });
-      });
-    })();
-
-    // LANGUAGE (simple client i18n)
-    (function(){
-      const key = "itbook_lang";
-      const dict = {
-        tg: {
-          brandTitle: "КИТОБЧАИ ТЕХНОЛОГИЯҲОИ ИТТИЛООТӢ",
-          brandSub: "ФЕҲРИСТ + САҲИФАҲО + КИТОБҲО + WIKIPEDIA",
-          navBook: "КИТОБ",
-          navBooks: "КИТОБҲО",
-          navWiki: "WIKI",
-          navAdmin: "АДМИН",
-          mode: "РЕЖИМ",
-          settings: "НАСТРОЙКА",
-          contacts: "Тамос ва шабакаҳо",
-          settingsTitle: "НАСТРОЙКА",
-          lang: "Забон",
-          langNote: "Забон барои матнҳои меню ва панел татбиқ мешавад.",
-          accent: "Ранги панел (Accent)",
-          accentNote: "Ранги тугмаҳо ва highlight-ҳо тағйир меёбад.",
-          support: "Служба поддержки",
-          supportNote: "Агар ягон чиз кор накунад — нависед, зуд ҳал мекунем."
-        },
-        ru: {
-          brandTitle: "ИТ-КНИЖКА",
-          brandSub: "ОГЛАВЛЕНИЕ + СТРАНИЦЫ + КНИГИ + WIKIPEDIA",
-          navBook: "УРОКИ",
-          navBooks: "КНИГИ",
-          navWiki: "WIKI",
-          navAdmin: "АДМИН",
-          mode: "РЕЖИМ",
-          settings: "НАСТРОЙКИ",
-          contacts: "Контакты и сети",
-          settingsTitle: "НАСТРОЙКИ",
-          lang: "Язык",
-          langNote: "Язык применяется к меню и панели.",
-          accent: "Цвет панели (Accent)",
-          accentNote: "Меняется цвет акцентов и выделений.",
-          support: "Служба поддержки",
-          supportNote: "Если что-то не работает — пишите, быстро решим."
-        },
-        en: {
-          brandTitle: "IT BOOKLET",
-          brandSub: "TOC + PAGES + BOOKS + WIKIPEDIA",
-          navBook: "LESSONS",
-          navBooks: "BOOKS",
-          navWiki: "WIKI",
-          navAdmin: "ADMIN",
-          mode: "MODE",
-          settings: "SETTINGS",
-          contacts: "Contacts & socials",
-          settingsTitle: "SETTINGS",
-          lang: "Language",
-          langNote: "Applies to menu and panel labels.",
-          accent: "Panel color (Accent)",
-          accentNote: "Changes highlights and accents.",
-          support: "Support",
-          supportNote: "If something doesn’t work — message us."
-        }
-      };
-
-      function apply(lang){
-        document.documentElement.setAttribute("lang", lang === "ru" ? "ru" : (lang === "en" ? "en" : "tg"));
-        document.querySelectorAll("[data-i18n]").forEach(el => {
-          const k = el.getAttribute("data-i18n");
-          const v = (dict[lang] || dict.tg)[k];
-          if (v) el.textContent = v;
-        });
-      }
-
-      const saved = localStorage.getItem(key) || "tg";
-      apply(saved);
-
-      document.querySelectorAll(".langBtn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const lang = btn.getAttribute("data-lang") || "tg";
-          localStorage.setItem(key, lang);
-          apply(lang);
         });
       });
     })();

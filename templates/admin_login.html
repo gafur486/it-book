@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-
-<div class="mx-auto max-w-xl rounded-3xl border border-slate-200 bg-white p-6">
-  <div class="text-xs tracking-wide text-slate-500">АДМИН</div>
-  <div class="text-2xl font-extrabold text-slate-900">Вуруд</div>
+<div class="mx-auto max-w-md rounded-3xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/60">
+  <div class="text-xs tracking-wide text-slate-500 dark:text-slate-400">ADMIN</div>
+  <div class="text-2xl font-extrabold">Login</div>
 
   {% if msg %}
     <div class="mt-4 rounded-2xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
@@ -13,21 +12,18 @@
 
   <form class="mt-6 space-y-3" method="post" action="/admin/login">
     <div>
-      <label class="text-sm font-semibold text-slate-700">Login</label>
-      <input name="login" required
-             class="mt-1 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 outline-none">
+      <label class="text-sm font-semibold">Login</label>
+      <input name="login" required class="mt-1 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 outline-none">
     </div>
 
     <div>
-      <label class="text-sm font-semibold text-slate-700">Password</label>
-      <input name="password" type="password" required
-             class="mt-1 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 outline-none">
+      <label class="text-sm font-semibold">Password</label>
+      <input name="password" type="password" required class="mt-1 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 outline-none">
     </div>
 
     <button class="w-full rounded-2xl bg-slate-900 px-4 py-2 font-bold text-white hover:bg-slate-800">
-      ДАРОМАДАН
+      Sign in
     </button>
   </form>
 </div>
-
 {% endblock %}

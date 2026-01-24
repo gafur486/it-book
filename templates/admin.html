@@ -2,38 +2,42 @@
 {% block content %}
 
 <div class="rounded-3xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/60">
-  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+  <div class="flex items-center justify-between gap-3">
     <div>
-      <div class="text-xs tracking-wide text-slate-500 dark:text-slate-400">АДМИН</div>
-      <div class="text-xl font-extrabold text-slate-900 dark:text-white">Панели админ</div>
-      <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-        PDF root: <span class="font-semibold">{{ pdf_root }}</span>
-      </div>
-      <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-        pending: <span class="font-semibold">{{ pending }}</span> | approved: <span class="font-semibold">{{ approved }}</span>
-      </div>
+      <div class="text-xs tracking-wide text-slate-500 dark:text-slate-400">ADMIN</div>
+      <div class="text-2xl font-extrabold">Dashboard</div>
+      <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Content root: {{ content_root }}</div>
     </div>
-
     <div class="flex gap-2">
-      <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                dark:border-slate-800 dark:hover:border-slate-600"
-         href="/admin/pdfs">
-        PDF (тасдиқ)
-      </a>
-      <a class="px-4 py-2 rounded-xl border border-slate-200 hover:border-slate-400
-                dark:border-slate-800 dark:hover:border-slate-600"
-         href="/admin/logout">
-        Баромадан
-      </a>
+      <a class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800" href="/admin/logout">Logout</a>
     </div>
   </div>
 
+  <div class="mt-6 grid gap-3 sm:grid-cols-2">
+    <a class="block rounded-2xl border border-slate-200 p-4 dark:border-slate-800" href="/admin/import">
+      <div class="font-bold">Import (Approve content)</div>
+      <div class="text-sm text-slate-500">Pending files: <b>{{ pending_count }}</b></div>
+      <div class="text-xs text-slate-400 mt-1">{{ pending_path }}</div>
+    </a>
+
+    <a class="block rounded-2xl border border-slate-200 p-4 dark:border-slate-800" href="/admin/lesson/new">
+      <div class="font-bold">Create lesson manually</div>
+      <div class="text-sm text-slate-500">Lessons in DB: <b>{{ lessons_count }}</b></div>
+    </a>
+
+    <a class="block rounded-2xl border border-slate-200 p-4 dark:border-slate-800" href="/admin/pdfs">
+      <div class="font-bold">Approve PDFs</div>
+      <div class="text-xs text-slate-400 mt-1">Pending: {{ pdf_pending }}</div>
+      <div class="text-xs text-slate-400">Approved: {{ pdf_approved }}</div>
+    </a>
+  </div>
+
   <div class="mt-6 text-sm text-slate-600 dark:text-slate-300">
-    Барои иловаи PDF:
+    <div class="font-bold">Workflow</div>
     <ul class="list-disc pl-5 mt-2">
-      <li>Файлро ба <b>pdf-book/pending</b> гузоред</li>
-      <li>Баъд дар <b>PDF (тасдиқ)</b> Approve кунед</li>
-      <li>Пас китоб дар <b>/books</b> пайдо мешавад</li>
+      <li>Put JSON lessons into <b>content/pending</b></li>
+      <li>Open <b>Import</b> and approve</li>
+      <li>Users will see them in sections immediately</li>
     </ul>
   </div>
 </div>

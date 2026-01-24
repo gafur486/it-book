@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="rounded-3xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/60">
+  <div class="text-xs tracking-wide text-slate-500 dark:text-slate-400">ENGLISH</div>
+  <div class="text-2xl font-extrabold">Choose a section</div>
+
+  <div class="mt-6 grid gap-3 sm:grid-cols-2">
+    {% for key, label in sections %}
+      <a href="/section/{{ key }}"
+         class="block rounded-2xl border border-slate-200 p-4 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-950/40">
+        <div class="font-bold">{{ label }}</div>
+        <div class="mt-1 text-sm text-slate-500 dark:text-slate-400">Open lessons →</div>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
