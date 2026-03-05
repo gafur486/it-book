@@ -1,9 +1,8 @@
-from sqlmodel import SQLModel, Session, create_engine
+from sqlmodel import SQLModel, create_engine, Session
 
-DB_URL = "sqlite:///./it_book.db"
-engine = create_engine(DB_URL, echo=False, connect_args={"check_same_thread": False})
+engine = create_engine("sqlite:///it_book.db", echo=False)
 
-def init_db() -> None:
+def init_db():
     SQLModel.metadata.create_all(engine)
 
 def get_session():

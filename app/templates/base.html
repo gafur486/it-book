@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="tg" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}it-book{% endblock %}</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <a class="brand-link" href="/">it-book</a>
+    </div>
+
+    <nav class="nav">
+      <a href="/wiki" data-i18n="wiki">Wiki</a>
+      <a href="/settings" data-i18n="settings">Settings</a>
+      {% if is_admin %}
+        <a href="/admin" class="pill">Admin</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <span>© it-book</span>
+  </footer>
+</body>
+</html>

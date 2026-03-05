@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Admin | it-book{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <h1>Admin</h1>
+    <form method="post" action="/admin/logout">
+      <button class="btn" type="submit">Logout</button>
+    </form>
+  </div>
+
+  <section class="card-pad">
+    <h2>Upload (Approved)</h2>
+    <form class="upload" method="post" action="/admin/upload" enctype="multipart/form-data">
+      <input name="title" placeholder="Номи китоб" required />
+      <input name="grade" type="number" min="1" max="11" placeholder="Синф" required />
+      <input name="pdf" type="file" accept="application/pdf" required />
+      <button class="btn" type="submit">Upload</button>
+    </form>
+    <p class="muted">
+      PDF-ҳо ба <code>storage/books/</code> мераванд.
+    </p>
+  </section>
+
+  <section class="card-pad">
+    <h2>Inbox (pdf-book/) → Import & Approve</h2>
+    {% if inbox %}
+      {% for f in inbox %}
+        <form class="inbox-row" method="post" action="/admin/import-inbox">
+          <input type="hidden" name="filename" value="{{f}}" />
+          <div class="mono">{{ f }}</div>
+          <input name="title" placeholder="Номи китоб" required />
+          <input name="grade" type="number" min="1" max="11" placeholder="Синф" required />
+          <button class="btn" type="submit">Approve</button>
+        </form>
+      {% endfor %}
+    {% else %}
+      <div class="muted">Inbox холӣ аст.</div>
+    {% endif %}
+  </section>
+
+  <section class="card-pad">
+    <h2>Approved</h2>
+    <div class="table">
+      <div class="row head">
+        <div>Title</div><div>Grade</div><div>File</div><div>Action</div>
+      </div>
+      {% for b in approved %}
+        <div class="row">
+          <div>{{ b.title }}</div>
+          <div>{{ b.grade }}</div>
+          <div><a href="/pdf/{{b.filename}}" target="_blank">{{ b.filename }}</a></div>
+          <div>
+            <form method="post" action="/admin/delete/{{b.id}}">
+              <button class="btn danger" type="submit">Delete</button>
+            </form>
+          </div>
+        </div>
+      {% else %}
+        <div class="muted">Ҳоло approved нест.</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="card-pad">
+    <h2>Pending (DB)</h2>
+    <div class="table">
+      <div class="row head">
+        <div>Title</div><div>Grade</div><div>File</div><div>Action</div>
+      </div>
+      {% for b in pending_db %}
+        <div class="row">
+          <div>{{ b.title }}</div>
+          <div>{{ b.grade }}</div>
+          <div>{{ b.filename }}</div>
+          <div>
+            <form method="post" action="/admin/approve/{{b.id}}">
+              <button class="btn" type="submit">Approve</button>
+            </form>
+          </div>
+        </div>
+      {% else %}
+        <div class="muted">Pending нест.</div>
+      {% endfor %}
+    </div>
+  </section>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Settings | it-book{% endblock %}
+
+{% block content %}
+  <h1 data-i18n="settings">Settings</h1>
+
+  <div class="settings">
+    <div class="setting-row">
+      <div>
+        <div class="setting-title" data-i18n="theme">Мавзӯъ</div>
+        <div class="muted" data-i18n="themeDesc">Рӯз/Шаб</div>
+      </div>
+      <div class="setting-actions">
+        <button class="btn" onclick="App.setTheme('light')" data-i18n="light">Сафед</button>
+        <button class="btn" onclick="App.setTheme('dark')" data-i18n="dark">Торик</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <div>
+        <div class="setting-title" data-i18n="language">Забон</div>
+        <div class="muted">tj / ru / en</div>
+      </div>
+      <div class="setting-actions">
+        <button class="btn" onclick="App.setLang('tj')">TJ</button>
+        <button class="btn" onclick="App.setLang('ru')">RU</button>
+        <button class="btn" onclick="App.setLang('en')">EN</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <div>
+        <div class="setting-title" data-i18n="accent">Ранги панел</div>
+        <div class="muted">Accent</div>
+      </div>
+      <div class="setting-actions">
+        <input type="color" id="accentPicker" />
+        <button class="btn" onclick="App.applyAccentFromPicker()" data-i18n="apply">Apply</button>
+      </div>
+    </div>
+  </div>
+{% endblock %}

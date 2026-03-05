@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Admin Login | it-book{% endblock %}
+
+{% block content %}
+  <h1>Admin Login</h1>
+
+  <form class="auth" method="post" action="/admin/login">
+    <label>Username</label>
+    <input name="username" required />
+    <label>Password</label>
+    <input name="password" type="password" required />
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+    <button class="btn" type="submit">Login</button>
+  </form>
+{% endblock %}

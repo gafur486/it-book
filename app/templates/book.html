@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{book.title}} | it-book{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <div>
+      <h1>{{ book.title }}</h1>
+      <div class="muted">Синф: {{ book.grade }}</div>
+    </div>
+    <div class="actions">
+      <a class="btn" href="/pdf/{{book.filename}}" target="_blank" rel="noopener" data-i18n="openPdf">Кушодани PDF</a>
+    </div>
+  </div>
+
+  <div class="viewer">
+    <iframe
+      class="pdf-frame"
+      src="/pdf/{{book.filename}}#view=FitH"
+      title="{{book.title}}"></iframe>
+  </div>
+{% endblock %}

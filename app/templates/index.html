@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}it-book | Китобҳо{% endblock %}
+
+{% block content %}
+  <div class="page-head">
+    <h1 data-i18n="books">Китобҳо</h1>
+
+    <form class="filters" method="get" action="/">
+      <input name="q" value="{{ q }}" placeholder="Ҷустуҷӯ..." />
+      <select name="grade">
+        <option value="" {% if grade is none %}selected{% endif %} data-i18n="allGrades">Ҳама синфҳо</option>
+        {% for g in range(1,12) %}
+          <option value="{{g}}" {% if grade == g %}selected{% endif %}>Синф {{g}}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" data-i18n="search">Ҷустуҷӯ</button>
+    </form>
+  </div>
+
+  <div class="grid">
+    {% for b in books %}
+      <a class="card" href="/book/{{b.id}}">
+        <div class="card-title">{{ b.title }}</div>
+        <div class="card-meta">Синф: {{ b.grade }}</div>
+      </a>
+    {% else %}
+      <div class="empty" data-i18n="noBooks">Ҳоло китоб нест.</div>
+    {% endfor %}
+  </div>
+{% endblock %}
